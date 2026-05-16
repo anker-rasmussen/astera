@@ -756,7 +756,7 @@ struct SettingsView: View {
                             .foregroundStyle(AsteraColor.accent)
                     }
                 }
-                Text("Saves a readable copy of every cycle, symptom and note you've logged. Open it in another app or send it to a doctor. It's yours.")
+                Text("Saves a clean PDF of every cycle, symptom, and note you've logged. Open it in any reader, print it, or send it to your clinician. It's yours.")
                     .font(.asteraSerifItalic(14))
                     .foregroundStyle(AsteraColor.iron)
                     .fixedSize(horizontal: false, vertical: true)
@@ -808,7 +808,8 @@ struct SettingsView: View {
             defer { isExporting = false }
             do {
                 let export = try ExportService.buildExport(context: modelContext)
-                let url = try ExportService.writeToTempFile(export)
+                let pdfData = PDFExportService.buildPDF(export)
+                let url = try PDFExportService.writeToTempFile(pdfData, exportedAt: export.exportedAt)
                 exportFileURL = URLWrapper(url: url)
             } catch {
                 // Silent failure for v1; could surface an error toast later.
