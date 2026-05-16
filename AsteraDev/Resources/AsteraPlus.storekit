@@ -1,0 +1,90 @@
+{
+  "identifier" : "ASTERA_PLUS_STOREKIT",
+  "nonRenewingSubscriptions" : [],
+  "products" : [
+    {
+      "displayPrice" : "30.00",
+      "familyShareable" : false,
+      "internalID" : "com.anker.astera.plus.lifetime",
+      "localizations" : [
+        {
+          "description" : "One-time. Astera+ forever, including all future Astera+ additions.",
+          "displayName" : "Astera+ Lifetime",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "com.anker.astera.plus.lifetime",
+      "referenceName" : "Astera+ Lifetime",
+      "type" : "NonConsumable"
+    }
+  ],
+  "settings" : {
+    "_applicationInternalID" : "ASTERA_DEV_APP",
+    "_developerTeamID" : "4QF4AHTV9B",
+    "_failTransactionsEnabled" : false,
+    "_locale" : "en_US",
+    "_storefront" : "USA",
+    "_storeKitErrors" : []
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "ASTERA_PLUS_GROUP",
+      "localizations" : [
+        {
+          "description" : "Optional support for keeping Astera free for everyone.",
+          "displayName" : "Astera+",
+          "locale" : "en_US"
+        }
+      ],
+      "name" : "Astera+",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [],
+          "codeOffers" : [],
+          "displayPrice" : "0.50",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "com.anker.astera.plus.monthly",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Astera+ monthly. Cancel any time.",
+              "displayName" : "Monthly",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "com.anker.astera.plus.monthly",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Astera+ Monthly",
+          "subscriptionGroupID" : "ASTERA_PLUS_GROUP",
+          "type" : "RecurringSubscription"
+        },
+        {
+          "adHocOffers" : [],
+          "codeOffers" : [],
+          "displayPrice" : "5.00",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "com.anker.astera.plus.yearly",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Astera+ yearly. About 17% cheaper than paying monthly.",
+              "displayName" : "Yearly",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "com.anker.astera.plus.yearly",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "Astera+ Yearly",
+          "subscriptionGroupID" : "ASTERA_PLUS_GROUP",
+          "type" : "RecurringSubscription"
+        }
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 4,
+    "minor" : 0
+  }
+}
