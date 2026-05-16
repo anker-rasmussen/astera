@@ -14,6 +14,7 @@ struct HomeView: View {
     @State private var showLogSheet = false
     @State private var showWhySheet = false
     @State private var editingCycleMode = false
+    @State private var didOpenInitialSheet = false
 
     private var profile: UserProfile? { profiles.first }
     private var latestCycle: Cycle? { cycles.first }
@@ -99,13 +100,28 @@ struct HomeView: View {
             syncCalendarIfEnabled()
             rescheduleNotificationsIfEnabled()
         }
+        .onAppear {
+            #if DEBUG
+            if !didOpenInitialSheet, ProcessInfo.processInfo.environment["ASTERA_OPEN_SHEET"] == "log" {
+                didOpenInitialSheet = true
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                    showLogSheet = true
+                }
+            } else if !didOpenInitialSheet, ProcessInfo.processInfo.environment["ASTERA_OPEN_SHEET"] == "why" {
+                didOpenInitialSheet = true
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                    showWhySheet = true
+                }
+            }
+            #endif
+        }
     }
 
     private var cycleTrackingHome: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: AsteraSpacing.xl) {
+            VStack(alignment: .leading, spacing: AsteraSpacing.lg) {
                 header
-                    .padding(.top, AsteraSpacing.lg)
+                    .padding(.top, AsteraSpacing.md)
 
                 Hairline()
 
@@ -118,11 +134,9 @@ struct HomeView: View {
                 Hairline()
 
                 logSurface
-
-                Spacer(minLength: AsteraSpacing.xl)
             }
             .asteraEditorialMargins()
-            .padding(.bottom, AsteraSpacing.xl)
+            .padding(.bottom, AsteraSpacing.md)
         }
         .asteraScreen()
     }
@@ -172,7 +186,7 @@ struct HomeView: View {
     }
 
     private var todayCard: some View {
-        VStack(alignment: .leading, spacing: AsteraSpacing.lg) {
+        VStack(alignment: .leading, spacing: AsteraSpacing.md) {
             CapsLabel(text: "Today")
             if let cycleDay {
                 HStack {
@@ -183,7 +197,6 @@ struct HomeView: View {
                     )
                     Spacer()
                 }
-                .padding(.vertical, AsteraSpacing.sm)
                 Text(cycleDayCaption(for: cycleDay))
                     .font(.asteraSerifItalic(14))
                     .foregroundStyle(AsteraColor.iron)
@@ -200,7 +213,7 @@ struct HomeView: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
-        .padding(.vertical, AsteraSpacing.lg)
+        .padding(.vertical, AsteraSpacing.sm)
     }
 
     private var estimatedCycleLength: Int {
@@ -216,11 +229,11 @@ struct HomeView: View {
         case .menstrual:
             return "Your period. Counting from \(startText)."
         case .follicular:
-            return "Follicular phase. Often a stretch of more energy. From \(startText)."
+            return "Follicular phase, often the higher-energy stretch. Counting from \(startText)."
         case .ovulation:
-            return "Mid-cycle window. From \(startText)."
+            return "Mid-cycle window. Counting from \(startText)."
         case .luteal:
-            return "Luteal phase. The days before your next period. From \(startText)."
+            return "Luteal phase, the stretch before your next period. Counting from \(startText)."
         }
     }
 
@@ -244,7 +257,7 @@ struct HomeView: View {
                         .foregroundStyle(AsteraColor.accent)
                 }
             }
-            .padding(.vertical, AsteraSpacing.lg)
+            .padding(.vertical, AsteraSpacing.md)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
