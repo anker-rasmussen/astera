@@ -20,7 +20,7 @@ struct PronounsStep: View {
     var body: some View {
         OnboardingScaffold(
             title: "What words should we use?",
-            subtitle: "We'll only use these. Never assumed.",
+            subtitle: "We'll only use what you pick. Nothing assumed.",
             currentStep: .pronouns,
             canContinue: canContinue,
             onBack: onBack,

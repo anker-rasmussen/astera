@@ -24,18 +24,18 @@ struct PrivacyStep: View {
     private var lockSubtitle: String {
         switch biometry {
         case .faceID, .touchID, .opticID:
-            return "Astera asks for \(biometry.humanName), or your phone's passcode, every time you open it."
+            return "Astera will ask for \(biometry.humanName), or your phone's passcode, every time you open it. Even when someone else has your phone in their hand."
         case .passcodeOnly:
-            return "Astera asks for your phone's passcode every time you open it."
+            return "Astera will ask for your phone's passcode every time you open it. Even when someone else has your phone in their hand."
         case .unavailable:
-            return "Set a passcode on your phone first, then come back and turn this on in Settings."
+            return "Set a passcode on your phone first, then come back and turn this on from Settings."
         }
     }
 
     var body: some View {
         OnboardingScaffold(
             title: "A lock for the app?",
-            subtitle: "Optional. The app works without it. If you turn it on, only you can open Astera, even on an unlocked phone.",
+            subtitle: "Optional. Astera works fine without it. If you turn it on, only you can open the app, even when someone else has your unlocked phone in their hand.",
             currentStep: .privacy,
             onBack: onBack,
             onSkip: onSkip,
@@ -52,7 +52,7 @@ struct PrivacyStep: View {
 
                 HairlineRow(
                     title: "No lock for now",
-                    subtitle: "The default. You can turn this on any time from Settings.",
+                    subtitle: "The default. You can turn it on from Settings any time.",
                     isSelected: !draft.useAppLock,
                     action: { draft.useAppLock = false; attemptFailed = false }
                 )

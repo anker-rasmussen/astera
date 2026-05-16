@@ -8,8 +8,8 @@ struct RelationshipStep: View {
 
     private let options: [(RelationshipStructure, String, String)] = [
         (.single, "just me", "The simplest setup."),
-        (.partneredTracking, "a partner who tracks too", "We'll offer optional partner sync later."),
-        (.partneredNotTracking, "a partner who doesn't", "We won't bug them about anything."),
+        (.partneredTracking, "a partner who tracks too", "Partner sync is coming later, if you'd like it."),
+        (.partneredNotTracking, "a partner who doesn't", "Nobody is going to bug them about anything."),
         (.polyamorous, "polyamorous", "Same options. No assumptions about structure.")
     ]
 

@@ -26,7 +26,7 @@ struct WelcomeView: View {
                 VStack(alignment: .leading, spacing: 6) {
                     Hairline()
                         .frame(width: 48)
-                    Text("Honest predictions.\nYour data stays yours.\nNothing to sell.")
+                    Text("Honest predictions.\nYour data stays here.\nNobody to sell it to.")
                         .font(.asteraSerifItalic(16))
                         .foregroundStyle(AsteraColor.iron)
                         .lineSpacing(2)

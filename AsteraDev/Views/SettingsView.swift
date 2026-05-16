@@ -788,7 +788,7 @@ struct SettingsView: View {
                             .foregroundStyle(AsteraColor.accent)
                     }
                 }
-                Text("Removes everything on this phone: cycles, symptoms, notes, settings. Any predicted dates we added to your Calendar go too. Once it's done it's gone, by design.")
+                Text("Wipes everything on this phone: every cycle, symptom, note, and setting. Anything we added to your Calendar goes too. Once it's done, it's gone. By design, there's no recovery.")
                     .font(.asteraSerifItalic(14))
                     .foregroundStyle(AsteraColor.iron)
                     .fixedSize(horizontal: false, vertical: true)

@@ -8,11 +8,11 @@ struct SalutationStep: View {
 
     /// (Tag, what we'll say at the top of Home, helper text shown in row)
     private let options: [(Salutation, String, String)] = [
-        (.none, "Hello.", "Quiet and neutral. The default."),
-        (.person, "Hey there.", "Warm without assuming anything."),
-        (.woman, "Hey, lady.", "Used only if it feels right."),
-        (.girl, "Hey, girlie 🌸", "A bit more sparkle."),
-        (.custom, "use my own words", "Tell us exactly what to say.")
+        (.none, "Hello.", "Quiet, neutral, the default."),
+        (.person, "Hey there.", "Warm, no assumptions."),
+        (.woman, "Hey, lady.", "If that feels right."),
+        (.girl, "Hey, girlie 🌸", "A little more familiar."),
+        (.custom, "use my own words", "Type your own greeting.")
     ]
 
     private var canContinue: Bool {
@@ -22,7 +22,7 @@ struct SalutationStep: View {
     var body: some View {
         OnboardingScaffold(
             title: "How should we greet you?",
-            subtitle: "This shows at the top of Home, every time you open the app. Skip and we'll just say \"Hello.\"",
+            subtitle: "Shows at the top of Home every time you open the app. If you skip, it's just \"Hello.\"",
             currentStep: .salutation,
             canContinue: canContinue,
             onBack: onBack,

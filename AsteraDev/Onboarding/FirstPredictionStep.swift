@@ -48,7 +48,7 @@ struct FirstPredictionStep: View {
                 Hairline()
                 VStack(alignment: .leading, spacing: AsteraSpacing.md) {
                     CapsLabel(text: "Your history is safe")
-                    Text("Whatever you've logged stays. Switching modes never deletes anything. When you're ready, you can switch back from Settings.")
+                    Text("Whatever you've already logged stays exactly where it is. Switching modes never deletes anything. When you're ready, you can switch back from Settings.")
                         .font(.asteraSerifItalic(15))
                         .foregroundStyle(AsteraColor.ink.opacity(0.85))
                         .lineSpacing(3)
@@ -61,10 +61,10 @@ struct FirstPredictionStep: View {
 
     private var quietTitle: String {
         switch draft.cycleMode {
-        case .pregnant: return "Pregnancy mode."
+        case .pregnant: return "We're switching to pregnancy mode."
         case .postLoss: return "We'll be quiet for a while."
         case .postpartum: return "Postpartum mode."
-        case .surgicalMenopause: return "No forecasts. Just you."
+        case .surgicalMenopause: return "No forecasts, just you."
         case .trackingOnT: return "No bleed forecasts here."
         default: return "Your first reading."
         }
@@ -72,11 +72,11 @@ struct FirstPredictionStep: View {
 
     private var quietSubtitle: String {
         switch draft.cycleMode {
-        case .pregnant: return "Period predictions are off. The home tab will count pregnancy weeks instead."
-        case .postLoss: return "Period reminders and predictions are quiet. The home tab will be gentle until you tell us you're ready."
-        case .postpartum: return "Period predictions are paused. Bodies take their time after birth. We'll quietly resume when you log a real cycle."
-        case .surgicalMenopause: return "Cycle predictions are off. The rest of the app stays available for symptoms, notes, and history."
-        case .trackingOnT: return "We won't forecast bleeds. Logging and history stay yours, as always."
+        case .pregnant: return "Period predictions are off. The home tab counts pregnancy weeks instead."
+        case .postLoss: return "We've quieted period reminders and predictions. The home tab will stay gentle for as long as you need."
+        case .postpartum: return "Period predictions are paused. Bodies take their time after birth. Whenever yours is ready, log a cycle and tracking will pick up again."
+        case .surgicalMenopause: return "Cycle predictions are off. Symptoms, notes, and history are still here for you."
+        case .trackingOnT: return "We won't forecast bleeds. Logging, history, and notes are still yours, like always."
         default: return ""
         }
     }
@@ -84,10 +84,10 @@ struct FirstPredictionStep: View {
     private var quietHomeExplainer: String {
         switch draft.cycleMode {
         case .pregnant: return "Pregnancy mode shows weeks since your last period, your trimester, and an estimated due date. Period prediction is paused. You can still log symptoms and notes from the home tab any time."
-        case .postLoss: return "The home tab will say \"We're here\" instead of counting cycle days. No period reminders. No predictions. A log button waits quietly below, for symptoms, notes, anything you need to write down."
-        case .postpartum: return "The home tab won't tell you you're \"late.\" Periods can return weeks or months after birth, and that's normal. When you log a real flow day, we'll quietly start tracking again."
-        case .surgicalMenopause: return "The home tab shows a gentle log entry point and your history. No forecasts, no reminders, no \"late\" alerts. Symptom and note logging stay available for clinician visits and your own records."
-        case .trackingOnT: return "The home tab keeps logging and history available without forecasting bleeds. Cycle changes on T are varied, and Astera won't pretend otherwise."
+        case .postLoss: return "The home tab will say \"We're here\" instead of counting cycle days. No period reminders. No predictions. A log button waits quietly below, for symptoms, notes, anything you might want to write down."
+        case .postpartum: return "The home tab won't tell you you're \"late.\" Periods can take weeks or even months to come back, especially if you're nursing. All of that is normal. When you log a flow day, tracking will quietly start up again."
+        case .surgicalMenopause: return "The home tab keeps logging and history available. No forecasts, no reminders, no \"late\" alerts. Symptom and note logging is still useful, especially for clinician visits."
+        case .trackingOnT: return "The home tab keeps logging and history available without forecasting bleeds. Cycle changes on T are real and varied, and Astera isn't going to pretend otherwise."
         default: return ""
         }
     }
@@ -96,8 +96,8 @@ struct FirstPredictionStep: View {
         OnboardingScaffold(
             title: "Your first reading.",
             subtitle: prediction.basis == .populationOnly
-                ? "We don't know your pattern yet. This is a friendly placeholder so the app is useful from day one. It'll sharpen as you log a few cycles."
-                : "An honest first guess. It tightens up as you log a few cycles.",
+                ? "We don't have your pattern yet, so this is a friendly placeholder. It'll sharpen as you log a few cycles."
+                : "An honest first guess. It'll tighten up as you log a few cycles.",
             currentStep: .firstPrediction,
             continueLabel: "Continue to home",
             showSkip: false,
@@ -152,17 +152,17 @@ struct FirstPredictionStep: View {
     private var reasoning: String {
         switch prediction.basis {
         case .populationOnly:
-            return "We're using a 28-day average because you haven't told us when your last period started. Once you log a cycle, this will use your own pattern instead."
+            return "We're using a 28-day average because you haven't logged a period start yet. Once you log one, this switches over to your own pattern."
         case .singleObservation(let lastStart, let length):
             let lastStartText = lastStart.formatted(.dateTime.day(.defaultDigits).month(.wide))
-            return "Your last period started \(lastStartText). We're guessing \(length) days from then, with a few-day window until we see more of your pattern."
+            return "Your last period started \(lastStartText). Our best guess is \(length) days from then, with a few-day window. It'll tighten up as you log more cycles."
         case .bayesian(let lastStart, _, let mean, _, _):
             let lastStartText = lastStart.formatted(.dateTime.day(.defaultDigits).month(.wide))
             let rounded = Int(mean.rounded())
             if draft.cycleLengthKnown {
-                return "Your last period started \(lastStartText). You told us your cycles run about \(rounded) days. We're guessing \(rounded) days from then, with a small window that'll narrow as you log more cycles."
+                return "Your last period started \(lastStartText). You told us your cycles run about \(rounded) days. Our best guess is \(rounded) days from then, with a small window that narrows as you log more."
             } else {
-                return "Your last period started \(lastStartText). Based on typical cycles for your mode, we're guessing \(rounded) days from then."
+                return "Your last period started \(lastStartText). Based on typical cycles for your mode, our best guess is \(rounded) days from then."
             }
         }
     }

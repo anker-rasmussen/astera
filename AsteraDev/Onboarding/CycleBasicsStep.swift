@@ -73,7 +73,7 @@ struct CycleBasicsStep: View {
                     }
                 }
                 .buttonStyle(.plain)
-                Text("If you can't remember, skip it. We'll use a sensible average until you log a real one.")
+                Text("If you can't remember, skip this. We'll use a sensible average until you log a real one.")
                     .font(.asteraSerifItalic(13))
                     .foregroundStyle(AsteraColor.iron)
                     .fixedSize(horizontal: false, vertical: true)
@@ -123,7 +123,7 @@ struct CycleBasicsStep: View {
                     }
                     .buttonStyle(AsteraLinkButtonStyle())
                 }
-                Text("We'll use a sensible default. Most cycles fall between 21 and 35 days.")
+                Text("We'll use the population average for now. Most cycles fall somewhere between 21 and 35 days.")
                     .font(.asteraSerifItalic(13))
                     .foregroundStyle(AsteraColor.iron)
                     .fixedSize(horizontal: false, vertical: true)
@@ -174,7 +174,7 @@ struct CycleBasicsStep: View {
                 Spacer()
             }
 
-            Text("Helps us frame things appropriately. Younger users see teen-mode framing, perimenopause-aged users see perimenopause language. Stays on this device.")
+            Text("This helps us frame things appropriately. Younger users see teen-mode framing, perimenopause-aged users see perimenopause language. It stays on this phone.")
                 .font(.asteraSerifItalic(13))
                 .foregroundStyle(AsteraColor.iron)
                 .fixedSize(horizontal: false, vertical: true)

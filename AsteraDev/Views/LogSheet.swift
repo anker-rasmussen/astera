@@ -95,7 +95,7 @@ struct LogSheet: View {
                 Text(headlineText)
                     .font(.asteraSerif(30, weight: .medium))
                     .foregroundStyle(AsteraColor.ink)
-                Text("Pick what fits. You can edit any time.")
+                Text("Pick what fits. You can edit any of it any time.")
                     .font(.asteraSerifItalic(14))
                     .foregroundStyle(AsteraColor.iron)
             }
@@ -134,7 +134,7 @@ struct LogSheet: View {
                 .padding(.bottom, AsteraSpacing.sm)
 
             Hairline()
-            flowRow(label: "no flow today", subtitle: "Nothing to log.", selected: draft.flow == nil) {
+            flowRow(label: "no flow today", subtitle: "Nothing to log on this front.", selected: draft.flow == nil) {
                 draft.flow = nil
             }
             Hairline()
@@ -178,10 +178,10 @@ struct LogSheet: View {
 
     private func flowDescription(for intensity: FlowIntensity) -> String {
         switch intensity {
-        case .spotting: return "A trace. Not full flow."
-        case .light: return "Most of the day on one pad, tampon, or cup."
+        case .spotting: return "Just a trace, not really flow."
+        case .light: return "One pad, tampon, or cup gets you through most of the day."
         case .medium: return "Changing every few hours."
-        case .heavy: return "Soaking through quickly. Worth keeping track of."
+        case .heavy: return "Going through products fast. Worth tracking, and worth mentioning to a doctor if it keeps up."
         }
     }
 
@@ -200,7 +200,7 @@ struct LogSheet: View {
         VStack(alignment: .leading, spacing: AsteraSpacing.md) {
             CapsLabel(text: "How you feel")
             symptomGrid(categories: visibleCategories(SymptomCategory.symptoms), severityEnabled: true)
-            Text("Tap to add. Tap again to set how strong: one dot mild, two moderate, three severe.")
+            Text("Tap to add. Tap again to set how strong it is: one dot for mild, two for moderate, three for severe.")
                 .font(.asteraSerifItalic(13))
                 .foregroundStyle(AsteraColor.iron)
                 .fixedSize(horizontal: false, vertical: true)
@@ -262,7 +262,7 @@ struct LogSheet: View {
             CapsLabel(text: "Notes")
             ZStack(alignment: .topLeading) {
                 if draft.notes.isEmpty {
-                    Text("Anything else worth keeping?")
+                    Text("Anything else you want to write down?")
                         .font(.asteraSerifItalic(16))
                         .foregroundStyle(AsteraColor.iron)
                         .padding(.top, 8)

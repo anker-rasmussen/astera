@@ -50,13 +50,13 @@ struct QuietHomeView: View {
     private var subtitleForMode: String {
         switch mode {
         case .postLoss:
-            return "All cycle reminders are quiet. Your history stays, exactly as it was. Take whatever time you need."
+            return "All of your cycle reminders are quiet now. Your history is safe, exactly as you left it. Take all the time you need. There's no clock."
         case .postpartum:
-            return "Periods can take many months to come back. That's normal. We'll wait quietly until you log a real cycle."
+            return "Your period might take a few weeks to come back, or many months, especially if you're nursing. Whenever it returns, we'll be here."
         case .surgicalMenopause:
-            return "Cycle predictions are off. The rest of the app stays available for logging symptoms, notes, and how you're feeling."
+            return "We've turned cycle predictions off. Everything else is still here for you, for logging symptoms, keeping notes, tracking how you're doing."
         case .trackingOnT:
-            return "We won't forecast bleeds while you're on T. Logging, history, and notes are all yours."
+            return "Bleeds on T have their own rhythm, and we're not going to forecast something this unpredictable. Logging, history, and notes are all still yours."
         default:
             return "Predictions are paused for now."
         }
@@ -90,9 +90,9 @@ struct QuietHomeView: View {
     private var careCopyTitle: String {
         switch mode {
         case .postLoss: return "There's no schedule for this."
-        case .postpartum: return "Bodies take their time."
-        case .surgicalMenopause: return "Different shape, same care."
-        case .trackingOnT: return "Your body, your pace."
+        case .postpartum: return "Bodies take their time after birth."
+        case .surgicalMenopause: return "The app still has plenty for you."
+        case .trackingOnT: return "Cycle changes on T are their own thing."
         default: return "No predictions for now."
         }
     }
@@ -100,13 +100,13 @@ struct QuietHomeView: View {
     private var careCopyBody: String {
         switch mode {
         case .postLoss:
-            return "Loss isn't a thing you're supposed to recover from in a number of weeks. Astera will be quiet about cycles until you tell us you're ready to track again. If you want to log a symptom or a note today, for yourself or because a clinician asked, the log is below."
+            return "Loss isn't something you're supposed to be over in a number of weeks. There is no timeline you're supposed to be on. Astera stays quiet about cycles for as long as you need. If you want to write something down today, for yourself or because a clinician asked, the log is right below."
         case .postpartum:
-            return "Periods returning after birth can take anywhere from a few weeks to many months, especially if you're nursing. There's no \"late\" here. When you log a flow day, we'll quietly start tracking again."
+            return "Periods come back when they come back. Sometimes it's a few weeks, sometimes many months, sometimes longer than that if you're nursing. All of that is normal. Whenever yours returns, log a flow day and tracking will quietly pick up again. There's no \"late\" here."
         case .surgicalMenopause:
-            return "Astera was built around cycles, but it's still useful when there isn't one. Log symptoms (hot flashes, sleep, mood, anything HRT-related), keep notes for clinician visits, and your full history stays put. Nothing here will pretend a bleed is about to arrive."
+            return "Astera was built around cycles, but it has plenty to offer when there isn't one. Log hot flashes, sleep, mood, anything HRT-related. Keep notes for clinician visits. Your full history stays exactly where it is. Nothing here will pretend a bleed is about to arrive."
         case .trackingOnT:
-            return "Cycle changes on T are varied. Some bleeds stop, some get lighter, some take a while to settle. Astera won't forecast what's not predictable. Logging stays available so you can keep notes for yourself or your provider."
+            return "Cycle changes on T are real and varied. Bleeds might stop entirely, get lighter, or take a long while to settle. Astera isn't going to forecast something this unpredictable. But logging is still here whenever you want it, for yourself or for your provider."
         default:
             return ""
         }
@@ -152,7 +152,7 @@ struct QuietHomeView: View {
                 }
             }
             .buttonStyle(.plain)
-            Text("This won't delete anything. It only changes how the home tab behaves.")
+            Text("Switching modes doesn't delete anything. It only changes how the home tab behaves.")
                 .font(.asteraSerifItalic(13))
                 .foregroundStyle(AsteraColor.iron)
                 .fixedSize(horizontal: false, vertical: true)

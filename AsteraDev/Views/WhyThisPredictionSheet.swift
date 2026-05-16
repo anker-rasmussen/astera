@@ -46,7 +46,7 @@ struct WhyThisPredictionSheet: View {
             Text("How we got here.")
                 .font(.asteraSerif(30, weight: .medium))
                 .foregroundStyle(AsteraColor.ink)
-            Text("Where the numbers came from. We won't show you a date without showing you the working underneath it.")
+            Text("Here's where the numbers come from. No guesses dressed up as certainty.")
                 .font(.asteraSerifItalic(15))
                 .foregroundStyle(AsteraColor.iron)
                 .lineSpacing(2)
@@ -71,7 +71,7 @@ struct WhyThisPredictionSheet: View {
 
     private var reasoningBlock: some View {
         VStack(alignment: .leading, spacing: AsteraSpacing.sm) {
-            CapsLabel(text: "What we did")
+            CapsLabel(text: "How we worked it out")
             Text(reasoningText)
                 .font(.asteraSerifItalic(15))
                 .foregroundStyle(AsteraColor.ink.opacity(0.85))
@@ -82,9 +82,9 @@ struct WhyThisPredictionSheet: View {
 
     private var observationsBlock: some View {
         VStack(alignment: .leading, spacing: AsteraSpacing.sm) {
-            CapsLabel(text: "What we've learned from you")
+            CapsLabel(text: "Your cycles so far")
             if observedLengths.isEmpty {
-                Text("No completed cycles yet. We're leaning on the average pattern for the mode you picked.")
+                Text("You haven't completed a full cycle here yet, so we're leaning on the average pattern for the mode you picked.")
                     .font(.asteraSerifItalic(15))
                     .foregroundStyle(AsteraColor.ink.opacity(0.85))
                     .lineSpacing(3)
@@ -122,7 +122,7 @@ struct WhyThisPredictionSheet: View {
 
     private var confidenceBlock: some View {
         VStack(alignment: .leading, spacing: AsteraSpacing.sm) {
-            CapsLabel(text: "On the window")
+            CapsLabel(text: "Why the window is this wide")
             Text(windowExplainer)
                 .font(.asteraSerifItalic(15))
                 .foregroundStyle(AsteraColor.ink.opacity(0.85))
@@ -136,26 +136,26 @@ struct WhyThisPredictionSheet: View {
     private var reasoningText: String {
         switch prediction.basis {
         case .populationOnly:
-            return "We don't have your last period start logged, so this is a guess based on average cycles for your mode (\(cycleMode.displayName.lowercased())). Log a period and we'll move to your own pattern."
+            return "You haven't logged a last period start yet, so this is a guess based on average cycles for your mode (\(cycleMode.displayName.lowercased())). Log a period and this will switch to your own pattern."
 
         case .singleObservation(let lastStart, let length):
             let dateText = lastStart.formatted(.dateTime.day(.defaultDigits).month(.wide))
-            return "Your last period started \(dateText). We're predicting \(length) days from then, using typical lengths for your mode (\(cycleMode.displayName.lowercased())). Once we see a few of your cycles, this prediction will use your own pattern instead."
+            return "Your last period started \(dateText). We're projecting \(length) days from then, using typical lengths for your mode (\(cycleMode.displayName.lowercased())). Once we've seen a few of your cycles, this prediction will use your own pattern instead."
 
         case .bayesian(let lastStart, let count, let mean, _, let mode):
             let dateText = lastStart.formatted(.dateTime.day(.defaultDigits).month(.wide))
             let rounded = Int(mean.rounded())
-            return "Your last period started \(dateText). Across \(count) cycle\(count == 1 ? "" : "s") of yours, blended with typical \(mode.displayName.lowercased()) cycles, the average works out to \(rounded) days. We project \(rounded) days forward from your last start."
+            return "Your last period started \(dateText). Across \(count) cycle\(count == 1 ? "" : "s") of yours, blended with typical \(mode.displayName.lowercased()) cycles, the average comes out to \(rounded) days. We're projecting that forward from your last start."
         }
     }
 
     private var windowExplainer: String {
         switch prediction.basis {
         case .populationOnly, .singleObservation:
-            return "The window is wide because we haven't seen enough of you yet. It reflects how variable your mode tends to be in general. It will tighten."
+            return "The window's wide right now because we haven't seen many of your cycles yet. It reflects how variable your mode tends to be in general, and it'll tighten as you log more."
         case .bayesian(_, let count, _, let stdDev, _):
             let half = Int((1.5 * stdDev).rounded())
-            return "We show a window of about ±\(max(1, half)) days, drawn to cover most of how your cycles have varied so far (\(count) logged). More cycles, tighter window. More variable cycles, wider window. That's the honest picture, not a flaw."
+            return "The window is about ±\(max(1, half)) days, drawn to cover most of how your cycles have varied so far (\(count) logged). The more you log, the tighter it gets. If your cycles are naturally variable, the window stays wider on purpose. That's honest, not a flaw."
         }
     }
 }

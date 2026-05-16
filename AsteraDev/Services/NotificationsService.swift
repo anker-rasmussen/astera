@@ -23,8 +23,8 @@ enum NotificationCategory: String, CaseIterable, Identifiable {
 
     var explainer: String {
         switch self {
-        case .periodInThreeDays: return "Sent once, three days before our best guess of your next period."
-        case .periodToday: return "Sent on the morning of our best guess of your next period."
+        case .periodInThreeDays: return "We'll send this once, three days before our best guess of your next period."
+        case .periodToday: return "We'll send this on the morning of our best guess of your next period."
         }
     }
 }
@@ -68,7 +68,7 @@ enum NotificationsService {
             case .periodInThreeDays:
                 fireDate = calendar.date(byAdding: .day, value: -3, to: prediction.center)
                 title = "A few days out"
-                body = "Your period is likely in about three days. Slip a few things into your bag if that helps."
+                body = "Your period is likely in about three days. A good time to slip a few things into your bag if that helps."
             case .periodToday:
                 fireDate = prediction.center
                 title = "Around today"
