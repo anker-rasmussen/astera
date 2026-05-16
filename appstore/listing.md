@@ -1,39 +1,45 @@
-# Astera. App Store Connect listing
+# Astera — App Store Connect listing
 
-Paste these into App Store Connect → My Apps → Astera. Character counts include spaces.
+Everything to paste into App Store Connect → My Apps → Astera. Character counts include spaces.
 
 ---
 
-## App Information (set once)
+## App Information (set once, persists across versions)
 
-**Name** (30 char limit, 6 used)
+**Name** (30 char limit, 22 used)
 ```
-Astera
-```
-
-**Subtitle** (30 char limit, 28 used)
-```
-Period tracker. Yours alone.
+Astera: Period tracker
 ```
 
-**Category, primary**
+**Subtitle** (30 char limit, 25 used)
+```
+Honest cycle predictions.
+```
+
+**Primary Category**
+```
 Health & Fitness
+```
 
-**Category, secondary**
-Medical _(optional, do not pick if it triggers extra App Review scrutiny you don't want; "Lifestyle" is the safe fallback.)_
+**Secondary Category** _(optional, broadens discovery without changing review scrutiny)_
+```
+Lifestyle
+```
 
 **Privacy Policy URL**
 ```
-https://github.com/<your-github-username>/astera/blob/main/PRIVACY.md
+https://anker-rasmussen.github.io/astera/privacy/
 ```
-_(Or set up GitHub Pages on the repo and use `https://<username>.github.io/astera/privacy` for a prettier URL. Apple accepts the raw GitHub URL; either works.)_
 
 **Support URL**
 ```
-https://github.com/<your-github-username>/astera/issues
+https://github.com/anker-rasmussen/astera/issues
 ```
 
-**Marketing URL** _(optional, leave blank for v1)_
+**Marketing URL** _(optional, recommend the landing page)_
+```
+https://anker-rasmussen.github.io/astera/
+```
 
 **Copyright**
 ```
@@ -42,111 +48,156 @@ https://github.com/<your-github-username>/astera/issues
 
 ---
 
-## Version Information (per release)
+## Version 1.0 (per-release metadata)
 
-**Version**
-```
-1.0
-```
+### Promotional Text (170 char limit, 132 used. Editable any time without re-submission.)
 
-**Promotional Text** (170 char limit, 145 used. Can change without resubmitting.)
 ```
-A privacy-first period tracker that doesn't sell your data. Free forever, no ads. Built for regular cycles, PCOS, endo, perimenopause, and on T.
+The tracker you'd build for your sister. Honest predictions, opt-in everything, your data never leaves your phone unless you ask.
 ```
 
-**Description** (4000 char limit, ~2,200 used)
+### Description (4000 char limit, ~2,800 used)
+
 ```
 A quieter way to know your body.
 
-Astera is a period and cycle tracker built for people who are tired of being treated like a data point. The full tracker is free, forever. There are no ads. There are no third-party SDKs in this app. Your cycles, symptoms, and notes live on your phone and, if you want, in your own iCloud. The person who built Astera cannot read your data, because there is no server to read it from.
+Astera is a period and cycle tracker built for people who are tired of being treated like a data point. The full tracker is free. There are no ads. There are no third-party SDKs. Your cycles, symptoms, and notes live on your phone and, if you want, in your own iCloud. The person who built Astera cannot read your data, because there is no server to read it from.
 
 HONEST PREDICTIONS
 
-Astera shows you a window, not a single date pretending to be certain. Every prediction comes with a confidence range, and a "why this prediction" view that shows the math. If your cycles are irregular, the window stays wider on purpose. That is honest, not a flaw.
+Astera shows you a window, not a single date pretending to be certain. Every prediction comes with a confidence range, and a "why this prediction" view that shows the math. If your cycles are irregular, the window stays wider on purpose. That's honest, not a bug.
+
+BRING YOUR HISTORY WITH YOU
+
+If you've been using Flo, Clue, Stardust, or Apple's built-in Cycle Tracking, Astera can pull your menstrual history straight from Apple Health. One tap. Years of data, restored. You don't start from scratch.
 
 FOR WHERE YOU ACTUALLY ARE
 
-Regular cycles. Irregular cycles. PCOS. Endometriosis. IUDs. Hormonal birth control. Perimenopause. Surgical menopause. Pregnancy. After pregnancy loss. Trying to conceive. Postpartum. Tracking on testosterone. Not sure yet.
+Regular cycles. Irregular cycles. PCOS. IUDs and hormonal birth control. Perimenopause. Surgical menopause. Pregnancy. After pregnancy loss. Trying to conceive. Postpartum. Tracking on testosterone. Not sure yet.
 
-Each of these is a first-class state with its own home tab, its own prediction behaviour, and its own copy. Switch between them any time. Your history stays exactly where it is, no matter how many times you switch.
+Each is a first-class state with its own home tab, its own prediction behaviour, and its own copy. Switch any time. Your history stays exactly where it is.
 
 CARE FOR THE HARD SCREENS
 
-The post-loss home tab says "We're here." Not "Day 14." Periods come back when they come back. Cycle changes on testosterone are real and varied. Astera was built with care for the screens that other apps treat as edge cases. None of those needs to be turned into a countdown.
+The post-loss home tab says "We're here." Not "Day 14." Periods come back when they come back. Cycle changes on testosterone are real and varied. Astera was built with care for the screens other apps treat as edge cases. None of those needs to be turned into a countdown.
 
-FREE, FOREVER
+LOG WHAT MATTERS, SKIP THE REST
 
-The full tracker is free. No paywall on education. No paywall on prediction. No paywall on the cohorts. No paywall on anything you actually need to track your cycle. Astera+ exists for people who want to support development and happen to want a few niche extras (clinical PDF export, hormone medication tracking, BBT charting, Apple Watch). The free tracker is the product. Astera+ is the tip jar.
+Per-symptom severity. Cravings tracking and lifestyle tracking, both off by default and easy to turn on if you'd like them. Sexual activity logging, off by default and hidden entirely for users under 16. The log sheet adapts to what you've chosen.
+
+EXPORT, NOT LOCK-IN
+
+Take a copy with you whenever you'd like: a clean PDF you can print, save, or hand to a clinician. Delete everything any time. Your data is yours.
+
+INCLUSIVE BY DESIGN
+
+Pronouns, salutation, and the greeting at the top of the home tab are all configurable. There's no assumption baked into the app about who you are. The greeting can even be your own words.
 
 PRIVACY, BY ARCHITECTURE
 
-Your data lives on this phone. If you are signed into iCloud, an encrypted copy syncs to your other Apple devices via Apple's iCloud, the same place your photos and notes live. The developer has no server, no analytics, no third-party SDK. With Advanced Data Protection on, not even Apple can read your data. You can export everything any time. You can delete everything any time.
+Your data lives on this phone. If you're signed into iCloud, an encrypted copy syncs to your own Apple devices, where your photos and notes already live. With Advanced Data Protection on, not even Apple can read it. There is no Astera-operated server. There is no Astera account.
 
-This is the tracker you would build for someone you love.
+ASTERA+
+
+The full tracker is free, always. Astera+ exists for people who'd like to support the project and happen to want a few extras (themes, widgets, detailed insights, custom symptoms, and the Apple Watch app on the way). Tip-jar pricing: 50p a month, £5 a year, or £30 once for lifetime. Never pushed. There's no paywall on anything you actually need.
+
+Astera makes no medical claims. Predictions are estimates, not advice. If something about your cycle worries you, please talk to a clinician.
+
+Built and maintained by one engineer in the UK.
 ```
 
-**Keywords** (100 char limit, 96 used. Comma-separated, no spaces.)
+### Keywords (100 char limit, 95 used. Comma-separated, no spaces.)
+
 ```
 cycle,menstrual,ovulation,fertility,PCOS,endo,perimenopause,menopause,pregnancy,postpartum,TTC
 ```
 
-_Don't include "period", "tracker", "privacy" or "Astera" in keywords. Those are already indexed from your name, subtitle, and description._
+_Don't repeat "period," "tracker," "privacy," or "Astera." Apple already indexes those from your name, subtitle, and description._
+
+### What's New in This Version (4000 char limit, used here for v1.0)
+
+```
+Welcome to Astera. The first version.
+```
 
 ---
 
-## App Privacy nutrition label (Privacy section in App Store Connect)
+## Screenshots (drag in order, 6.9″ slot accepts 1284×2778)
 
-**Do you or your third-party partners collect data from this app?**
+Located at `appstore/screenshots/` in the repo. Recommended carousel order:
+
+1. `01-home.png` — daily hero: cycle ring, prediction, log button
+2. `02-why-prediction.png` — confidence ranges, math shown
+3. `08-promise.png` — "Astera doesn't collect anything"
+4. `03-settings-top.png` — inclusive profile + opt-in logging
+5. `04-bring-history.png` — import from Apple Health
+6. `05-history.png` — calendar of cycles
+7. `06-log-sheet.png` — clean log UI
+8. `07-log-sheet-scrolled.png` — severity, cravings, lifestyle depth
+
+---
+
+## App Privacy questionnaire (App Privacy → Get Started)
+
+**Q: Do you or your third-party partners collect data from this app?**
 ```
 No
 ```
 
-That is the entire answer. Astera does not collect any data. CloudKit Private Database and HealthKit do not count as developer-side collection because the data lives in the user's own iCloud and Apple Health, never in any system the developer can read. The nutrition label will display "Data Not Collected."
+That's the entire answer. Astera does not collect any data. iCloud Private Database and HealthKit storage do not count as developer-side collection — the data lives in the user's own iCloud and Apple Health, never in any system the developer can read. The nutrition label will render "Data Not Collected" across every category.
 
-If App Store Connect asks follow-up questions: the answer is "No" to every category.
+If App Store Connect prompts follow-ups, the answer is "No" to every category (Contact Info, Health & Fitness, Financial Info, Location, Identifiers, Usage Data, Diagnostics, etc.).
 
 ---
 
-## Age rating
+## Age Rating questionnaire
 
-When you fill out the age rating questionnaire, the relevant flags are:
+| Category | Answer |
+|---|---|
+| Medical / Treatment Information | **Infrequent / Mild** _(predictions framed as estimates, not advice)_ |
+| Sexual Content or Nudity | **None** _(sex-related logging chips are hidden for under-16 users, hidden by default for 16+, and contain no graphic content even when enabled)_ |
+| Cartoon / Fantasy Violence | None |
+| Realistic Violence | None |
+| Profanity / Crude Humor | None |
+| Alcohol / Tobacco / Drug Use | None |
+| Mature / Suggestive Themes | None |
+| Horror / Fear Themes | None |
+| Gambling | None |
+| Contests | None |
+| Unrestricted Web Access | None |
+| Made for Kids | No |
 
-- Medical/Treatment Information: **Infrequent/Mild** (predictions are framed as estimates, not advice).
-- Sexual Content or Nudity: **None** (no images; sex-related logging chips are off by default for under-18 users via teen mode).
-- All other categories: **None**.
-
-Expected outcome: **12+** rating.
+**Expected outcome: 12+**
 
 ---
 
 ## Pricing & Availability
 
-- Price: **Free**
-- Availability: All territories (or pick the subset you want to launch in first; UK and US is a reasonable starting set).
-- In-App Purchases: none for v1.0. Astera+ launches in v1.1 per the spec.
+- **Price**: Free
+- **Availability**: All territories (recommend launching everywhere; the app has no regional dependencies)
 
 ---
 
 ## Export Compliance
 
-Already declared via `ITSAppUsesNonExemptEncryption=false` in Info.plist. App Store Connect will not ask the encryption questionnaire on submission.
+Pre-declared via `ITSAppUsesNonExemptEncryption=false` in `AsteraDev/Info.plist`. App Store Connect won't ask the encryption questionnaire at submission. If it does, answer **No, doesn't use encryption** (we use Apple's standard frameworks; the exemption applies).
 
 ---
 
-## Build
+## Build management (before each upload)
 
-- Increment `CFBundleVersion` to `2` (or any value higher than what is already uploaded) before each new upload to App Store Connect. `CFBundleShortVersionString` stays at `1.0` for the first public version.
-- Archive: Xcode → Product → Archive.
-- Upload: Xcode Organizer → Distribute App → App Store Connect.
+- `CFBundleShortVersionString` stays at `1.0` for the first public version
+- Increment `CFBundleVersion` (build number) on every upload to App Store Connect (`1`, `2`, `3`, ...)
+- Xcode Cloud handles archive + upload to TestFlight automatically. Once your build is on TestFlight you can attach it to the v1.0 record in App Store Connect.
 
 ---
 
-## CloudKit production schema
+## CloudKit production schema (do this before submission)
 
 Before the first public submission, deploy the development schema to production in CloudKit Dashboard:
 
 1. Open [icloud.developer.apple.com](https://icloud.developer.apple.com)
-2. Pick the `iCloud.com.anker.astera` container.
-3. Schema → Development → "Deploy Schema to Production".
+2. Pick the `iCloud.com.anker.astera` container
+3. Schema → Development → **Deploy Schema to Production**
 
-If you skip this, CloudKit sync silently fails in production builds. Easiest thing in the world to forget.
+If you skip this, CloudKit sync silently fails in production builds. The single easiest pre-launch thing to forget.
