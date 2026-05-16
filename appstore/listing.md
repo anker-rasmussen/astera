@@ -99,7 +99,7 @@ Your data lives on this phone. If you're signed into iCloud, an encrypted copy s
 
 ASTERA+
 
-The full tracker is free, always. Astera+ exists for people who'd like to support the project and happen to want a few extras (themes, widgets, detailed insights, custom symptoms, and the Apple Watch app on the way). Tip-jar pricing: 50p a month, £5 a year, or £30 once for lifetime. Never pushed. There's no paywall on anything you actually need.
+The full tracker is free, always. Astera+ exists for people who'd like to support the project and happen to want a few extras (themes, widgets, detailed insights, custom symptoms, and the Apple Watch app on the way). Tip-jar pricing: under 50p a month, under £5 a year, or £29.99 once for lifetime. Never pushed. There's no paywall on anything you actually need.
 
 Astera makes no medical claims. Predictions are estimates, not advice. If something about your cycle worries you, please talk to a clinician.
 

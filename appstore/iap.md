@@ -30,7 +30,7 @@ Both monthly and yearly products live inside this group. Users moving between th
 | **Product ID** | `com.anker.astera.plus.monthly` |
 | **Subscription Group** | Astera+ |
 | **Subscription Duration** | 1 Month |
-| **Price** | £0.50 (Tier 1) |
+| **Price** | $0.49 USD / £0.49 GBP / €0.49 EUR (region-customised, granular pricing) |
 
 **Localization: English (UK)**
 
@@ -57,7 +57,7 @@ Astera+ is an optional support tier. The free version of Astera includes all cor
 | **Product ID** | `com.anker.astera.plus.yearly` |
 | **Subscription Group** | Astera+ |
 | **Subscription Duration** | 1 Year |
-| **Price** | £5.00 (Tier 5) |
+| **Price** | $4.99 USD / £4.99 GBP / €4.99 EUR (region-customised) |
 
 **Localization: English (UK)**
 
@@ -77,7 +77,7 @@ Astera+ is an optional support tier. The free version of Astera includes all cor
 | **Type** | Non-Consumable |
 | **Reference Name** _(private)_ | `Astera+ Lifetime` |
 | **Product ID** | `com.anker.astera.plus.lifetime` |
-| **Price** | £30.00 (Tier 30) |
+| **Price** | $29.99 USD / £29.99 GBP / €29.99 EUR (region-customised) |
 
 **Localization: English (UK)**
 

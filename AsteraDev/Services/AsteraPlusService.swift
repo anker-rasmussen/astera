@@ -149,7 +149,7 @@ extension Product {
         case AsteraPlusService.Tier.monthly.rawValue:
             return "\(displayPrice) a month. Cancel any time, from the App Store."
         case AsteraPlusService.Tier.yearly.rawValue:
-            return "\(displayPrice) a year. About 17% cheaper than paying monthly."
+            return "\(displayPrice) a year. A small discount on the monthly price."
         case AsteraPlusService.Tier.lifetime.rawValue:
             return "\(displayPrice) once. Astera+ for as long as the app exists. No renewals."
         default: return displayPrice
