@@ -83,11 +83,60 @@ struct AsteraPlusView: View {
                 }
             }
 
+            restoreControl
+                .padding(.top, AsteraSpacing.sm)
+        }
+    }
+
+    @ViewBuilder
+    private var restoreControl: some View {
+        switch service.restoreOutcome {
+        case .restoring:
+            HStack(spacing: 8) {
+                ProgressView()
+                    .controlSize(.small)
+                    .tint(AsteraColor.accent)
+                Text("Checking with Apple…")
+                    .font(.asteraSerifItalic(14))
+                    .foregroundStyle(AsteraColor.iron)
+            }
+        case .restoredWithPurchases:
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Welcome back. Astera+ restored on this device.")
+                    .font(.asteraSerifItalic(14))
+                    .foregroundStyle(AsteraColor.ink)
+                Button("Done") { service.acknowledgeRestoreOutcome() }
+                    .buttonStyle(AsteraLinkButtonStyle())
+            }
+        case .nothingToRestore:
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Nothing to restore. No Astera+ purchases were found on the Apple ID you're signed into.")
+                    .font(.asteraSerifItalic(14))
+                    .foregroundStyle(AsteraColor.iron)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .lineSpacing(2)
+                Button("Try again") {
+                    Task { await service.restore() }
+                }
+                .buttonStyle(AsteraLinkButtonStyle())
+            }
+        case .failed(let message):
+            VStack(alignment: .leading, spacing: 4) {
+                Text(message)
+                    .font(.asteraSerifItalic(14))
+                    .foregroundStyle(AsteraColor.accent)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .lineSpacing(2)
+                Button("Try again") {
+                    Task { await service.restore() }
+                }
+                .buttonStyle(AsteraLinkButtonStyle())
+            }
+        case .idle:
             Button("Restore a previous purchase") {
                 Task { await service.restore() }
             }
             .buttonStyle(AsteraLinkButtonStyle())
-            .padding(.top, AsteraSpacing.sm)
         }
     }
 

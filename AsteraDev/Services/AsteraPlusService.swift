@@ -17,10 +17,19 @@ final class AsteraPlusService {
         var id: String { rawValue }
     }
 
+    enum RestoreOutcome: Equatable {
+        case idle
+        case restoring
+        case restoredWithPurchases
+        case nothingToRestore
+        case failed(String)
+    }
+
     var products: [Product] = []
     private(set) var hasAsteraPlus: Bool = false
     private(set) var isLoading: Bool = false
     private(set) var lastError: String?
+    private(set) var restoreOutcome: RestoreOutcome = .idle
 
     private var updateListener: Task<Void, Never>?
 
@@ -92,13 +101,26 @@ final class AsteraPlusService {
         }
     }
 
+    /// Triggers Apple's restore flow. On a real device or in TestFlight Sandbox this prompts
+    /// the user for their Apple ID password (or Face ID) to verify the request.
+    /// In the simulator with a local .storekit config the prompt is suppressed by Apple by design.
     func restore() async {
+        restoreOutcome = .restoring
         do {
             try await AppStore.sync()
         } catch {
-            lastError = "Couldn't reach Apple's servers. Try again later."
+            let message = "Couldn't reach Apple's servers. Check your connection and try again."
+            lastError = message
+            restoreOutcome = .failed(message)
+            return
         }
         await refreshEntitlements()
+        restoreOutcome = hasAsteraPlus ? .restoredWithPurchases : .nothingToRestore
+    }
+
+    /// Clears the outcome message after the user has seen it (e.g. when they tap away).
+    func acknowledgeRestoreOutcome() {
+        restoreOutcome = .idle
     }
 
     private func listenForUpdates() async {
