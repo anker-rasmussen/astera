@@ -43,6 +43,6 @@ struct PrivacyPolicy {
 
     Astera is built and maintained by one engineer. If you have a question this doesn't answer, the project repo on GitHub is the place to file an issue.
 
-    This policy is hash-committed to the public Astera repository. Any future changes will be visible in its history.
+    Any future changes to this policy will appear here under a new version number, and the change will be summarised in the app the next time you open it.
     """
 }
