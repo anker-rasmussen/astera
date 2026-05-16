@@ -426,6 +426,8 @@ struct BirthYearEditView: View {
         profile.birthYear = year
         profile.modifiedAt = Date()
         try? modelContext.save()
+        // If lowering the year crossed an age gate, clear any toggles that should now be hidden.
+        AgeMode.reconcileAgeGatedSettings(birthYear: year)
         onDismiss()
     }
 }

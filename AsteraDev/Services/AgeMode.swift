@@ -44,6 +44,17 @@ enum AgeMode {
     static func hideSexualContent(birthYear: Int) -> Bool {
         age(forBirthYear: birthYear) < sexualContentThreshold
     }
+
+    /// Forces age-gated settings back to safe defaults if the user's birth year now puts
+    /// them below the relevant threshold. Call this whenever birthYear changes (profile edit,
+    /// onboarding) and as a safety net on app launch. The premise: consent doesn't carry
+    /// across an age change. If they were 17 and turned on sexual activity, then changed
+    /// their birth year to make themselves 15, the toggle should go back to off.
+    static func reconcileAgeGatedSettings(birthYear: Int, defaults: UserDefaults = .standard) {
+        if hideSexualContent(birthYear: birthYear) {
+            defaults.set(false, forKey: AppStorageKey.showSexualActivity.rawValue)
+        }
+    }
 }
 
 extension UserProfile {

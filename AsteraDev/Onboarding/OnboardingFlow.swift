@@ -93,6 +93,8 @@ struct OnboardingFlow: View {
     private func finish() {
         persistDraft()
         requiresAppLock = draft.useAppLock
+        // Defensive: if the entered birth year puts them below an age gate, force toggles off.
+        AgeMode.reconcileAgeGatedSettings(birthYear: draft.birthYear)
         hasCompletedOnboarding = true
     }
 

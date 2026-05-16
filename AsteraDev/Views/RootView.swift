@@ -1,10 +1,12 @@
 import SwiftUI
+import SwiftData
 
 struct RootView: View {
     @AppStorage(AppStorageKey.hasCompletedOnboarding.rawValue) private var hasCompletedOnboarding: Bool = false
     @AppStorage(AppStorageKey.requiresAppLock.rawValue) private var requiresAppLock: Bool = false
     @Environment(\.modelContext) private var modelContext
     @Environment(\.scenePhase) private var scenePhase
+    @Query(sort: \UserProfile.createdAt, order: .reverse) private var profiles: [UserProfile]
 
     @State private var isLocked: Bool = false
 
@@ -34,6 +36,13 @@ struct RootView: View {
             }
             #endif
             if requiresAppLock { isLocked = true }
+            // Safety net: if the user's saved birth year now puts them below an age gate
+            // (because they edited it, or the year ticked over to their birthday), force
+            // the corresponding toggles off so nothing they consented to at a higher age
+            // silently survives.
+            if let profile = profiles.first {
+                AgeMode.reconcileAgeGatedSettings(birthYear: profile.birthYear)
+            }
         }
         .onChange(of: scenePhase) { _, newPhase in
             switch newPhase {
