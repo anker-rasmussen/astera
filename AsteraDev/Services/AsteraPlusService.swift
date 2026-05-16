@@ -10,9 +10,9 @@ final class AsteraPlusService {
     static let shared = AsteraPlusService()
 
     enum Tier: String, CaseIterable, Identifiable {
-        case monthly = "com.anker.astera.plus.monthly"
-        case yearly = "com.anker.astera.plus.yearly"
-        case lifetime = "com.anker.astera.plus.lifetime"
+        case monthly = "000"
+        case yearly = "001"
+        case lifetime = "002"
 
         var id: String { rawValue }
     }

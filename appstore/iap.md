@@ -27,7 +27,7 @@ Both monthly and yearly products live inside this group. Users moving between th
 |---|---|
 | **Type** | Auto-Renewable Subscription |
 | **Reference Name** _(private)_ | `Astera+ Monthly` |
-| **Product ID** | `com.anker.astera.plus.monthly` |
+| **Product ID** | `000` |
 | **Subscription Group** | Astera+ |
 | **Subscription Duration** | 1 Month |
 | **Price** | $0.49 USD / £0.49 GBP / €0.49 EUR (region-customised, granular pricing) |
@@ -54,7 +54,7 @@ Astera+ is an optional support tier. The free version of Astera includes all cor
 |---|---|
 | **Type** | Auto-Renewable Subscription |
 | **Reference Name** _(private)_ | `Astera+ Yearly` |
-| **Product ID** | `com.anker.astera.plus.yearly` |
+| **Product ID** | `001` |
 | **Subscription Group** | Astera+ |
 | **Subscription Duration** | 1 Year |
 | **Price** | $4.99 USD / £4.99 GBP / €4.99 EUR (region-customised) |
@@ -64,7 +64,7 @@ Astera+ is an optional support tier. The free version of Astera includes all cor
 | Field | Value |
 |---|---|
 | **Display Name** | `Astera+ Yearly` |
-| **Description** | `Yearly support for Astera at about 17% off the monthly price. Includes themes, widgets, detailed cycle insights, custom symptoms and flow types, and the Apple Watch app as it ships. Cancel any time.` |
+| **Description** | `Yearly support for Astera. A small discount on the monthly price. Includes themes, widgets, detailed cycle insights, custom symptoms and flow types, and the Apple Watch app as it ships. Cancel any time.` |
 
 **Review Information**: same screenshot + notes as Monthly.
 
@@ -76,7 +76,7 @@ Astera+ is an optional support tier. The free version of Astera includes all cor
 |---|---|
 | **Type** | Non-Consumable |
 | **Reference Name** _(private)_ | `Astera+ Lifetime` |
-| **Product ID** | `com.anker.astera.plus.lifetime` |
+| **Product ID** | `002` |
 | **Price** | $15.00 USD / £15.00 GBP / €15.00 EUR (region-customised, round-number tip-jar pricing) |
 
 **Localization: English (UK)**

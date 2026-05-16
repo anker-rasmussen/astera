@@ -13,7 +13,7 @@
           "locale" : "en_US"
         }
       ],
-      "productID" : "com.anker.astera.plus.lifetime",
+      "productID" : "002",
       "referenceName" : "Astera+ Lifetime",
       "type" : "NonConsumable"
     }
@@ -53,7 +53,7 @@
               "locale" : "en_US"
             }
           ],
-          "productID" : "com.anker.astera.plus.monthly",
+          "productID" : "000",
           "recurringSubscriptionPeriod" : "P1M",
           "referenceName" : "Astera+ Monthly",
           "subscriptionGroupID" : "ASTERA_PLUS_GROUP",
@@ -74,7 +74,7 @@
               "locale" : "en_US"
             }
           ],
-          "productID" : "com.anker.astera.plus.yearly",
+          "productID" : "001",
           "recurringSubscriptionPeriod" : "P1Y",
           "referenceName" : "Astera+ Yearly",
           "subscriptionGroupID" : "ASTERA_PLUS_GROUP",
