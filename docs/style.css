@@ -1,0 +1,80 @@
+:root {
+  --vellum: #f8e3d7;
+  --ink: #1f181c;
+  --iron: #5c4a4f;
+  --accent: #b04956;
+  --hairline: rgba(31, 24, 28, 0.14);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --vellum: #1f1615;
+    --ink: #f3e7e1;
+    --iron: #b8a59f;
+    --accent: #d97187;
+    --hairline: rgba(243, 231, 225, 0.14);
+  }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--vellum);
+  color: var(--ink);
+  font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+  font-size: 17px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+.page {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 56px 28px 96px;
+}
+.caps {
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--iron);
+  margin: 0 0 12px;
+}
+h1 {
+  font-weight: 500;
+  font-size: 38px;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  margin: 0 0 8px;
+}
+h2 {
+  font-weight: 500;
+  font-size: 22px;
+  line-height: 1.25;
+  margin: 32px 0 8px;
+}
+p { margin: 0 0 14px; }
+p.italic, .sub { font-style: italic; color: var(--iron); }
+hr { border: none; border-top: 0.5px solid var(--hairline); margin: 28px 0; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.meta { font-style: italic; font-size: 14px; color: var(--iron); margin-top: 24px; }
+.footer {
+  margin-top: 64px;
+  padding-top: 24px;
+  border-top: 0.5px solid var(--hairline);
+  font-style: italic;
+  font-size: 13px;
+  color: var(--iron);
+}
+.back {
+  display: inline-block;
+  margin-bottom: 24px;
+  font-size: 13px;
+  font-style: italic;
+  color: var(--accent);
+}
+.constellation {
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 10px;
+}
