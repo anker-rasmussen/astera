@@ -46,7 +46,7 @@ You can change everything you told us during setup. Settings → About you. Pron
 
 ## Children and teens
 
-Astera is intended for users who are 13 or older. If a user enters a birth year that suggests they're under 18, Astera quietly hides fertility and pregnancy-related features. If a user enters a birth year below 9, Astera shows a gentle note suggesting a trusted adult is a better resource than an app for the earliest years. We do not knowingly collect any data from anyone, regardless of age, because we do not collect data at all.
+Astera is intended for users who are 13 or older. If a user enters a birth year that suggests they're under 18, Astera quietly hides fertility and pregnancy-related features. Sexual activity logging is hidden for users under 16. If a user enters a birth year below 9, Astera shows a gentle note suggesting a trusted adult is a better resource than an app for the earliest years. We do not knowingly collect any data from anyone, regardless of age, because we do not collect data at all.
 
 ## The legal small print
 
