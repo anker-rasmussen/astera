@@ -1,0 +1,14 @@
+#!/bin/bash
+# Instant checks only. Anything that needs a simulator belongs in CI, not in the way of a commit.
+#
+# Enable with:  git config core.hooksPath scripts/hooks
+# Skip once:    git commit --no-verify
+set -euo pipefail
+
+cd "$(git rev-parse --show-toplevel)"
+
+echo "pre-commit: privacy artifacts"
+python3 scripts/build_privacy.py --check
+
+echo "pre-commit: App Store metadata"
+python3 scripts/check_consistency.py

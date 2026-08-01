@@ -1,16 +1,12 @@
 name: Checks
 
-# Guards against the same fact being written down twice and the copies disagreeing. Both scripts
-# are plain Python with no dependencies, so this needs no toolchain beyond the runner's python3.
-#
-# Deliberately not part of the Xcode Cloud build: a failure here should block a merge, not an
-# archive you are trying to ship.
-
 on:
   push:
   pull_request:
 
 jobs:
+  # Fast, dependency-free, runs on Linux. Guards against the same fact being written down twice
+  # and the copies disagreeing.
   consistency:
     runs-on: ubuntu-latest
     steps:
@@ -24,3 +20,62 @@ jobs:
       # App Store paperwork. They have to match what the app declares.
       - name: App Store metadata matches the app
         run: python3 scripts/check_consistency.py
+
+  # Unit tests and the full end-to-end suite, on a simulator.
+  tests:
+    runs-on: macos-15
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select the newest Xcode
+        run: |
+          sudo xcode-select -s "$(ls -d /Applications/Xcode*.app | sort -V | tail -1)"
+          xcodebuild -version
+
+      - name: Install xcodegen
+        run: brew install xcodegen
+
+      - name: Generate the project
+        run: xcodegen generate
+
+      # Runner images change their simulator lineup between Xcode releases, so pick whatever
+      # iPhone is actually installed rather than hardcoding a model that may vanish.
+      - name: Pick a simulator
+        id: sim
+        run: |
+          DEVICE=$(xcrun simctl list devices available --json | python3 -c '
+          import json, sys
+          data = json.load(sys.stdin)["devices"]
+          runtimes = sorted(r for r in data if "iOS" in r)
+          for runtime in reversed(runtimes):
+              phones = [d for d in data[runtime] if d["name"].startswith("iPhone")]
+              if phones:
+                  print(phones[-1]["name"])
+                  break
+          ')
+          echo "Using simulator: $DEVICE"
+          echo "device=$DEVICE" >> "$GITHUB_OUTPUT"
+
+      # One worker: the hosted runner has less RAM than a laptop, and each parallel worker is a
+      # full simulator clone. Locally, two workers is fastest; see scripts/run_tests.sh.
+      - name: Test
+        run: |
+          xcodebuild test \
+            -project AsteraDev.xcodeproj \
+            -scheme AsteraDev \
+            -destination "platform=iOS Simulator,name=${{ steps.sim.outputs.device }}" \
+            -parallel-testing-enabled NO \
+            -resultBundlePath TestResults.xcresult \
+            CODE_SIGNING_ALLOWED=NO \
+            | xcpretty && exit ${PIPESTATUS[0]}
+
+      # The bundle holds the failure screenshots XCUITest captures automatically, which is the
+      # only way to see what a UI failure actually looked like on a machine you cannot open.
+      - name: Upload results on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: TestResults
+          path: TestResults.xcresult
+          retention-days: 7

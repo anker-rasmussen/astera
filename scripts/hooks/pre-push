@@ -1,0 +1,29 @@
+#!/bin/bash
+# Unit tests before a push. Deliberately not the end-to-end suite: that is ~5 minutes and belongs
+# in CI, where it does not stand between you and a push.
+#
+# Enable with:  git config core.hooksPath scripts/hooks
+# Skip once:    git push --no-verify
+set -euo pipefail
+
+cd "$(git rev-parse --show-toplevel)"
+
+if ! command -v xcodegen >/dev/null; then
+    echo "pre-push: xcodegen not installed, skipping unit tests" >&2
+    exit 0
+fi
+
+echo "pre-push: unit tests"
+xcodegen generate >/dev/null
+
+DESTINATION="${DESTINATION:-platform=iOS Simulator,name=iPhone 17 Pro}"
+
+if ! xcodebuild test \
+    -project AsteraDev.xcodeproj \
+    -scheme AsteraDev \
+    -destination "$DESTINATION" \
+    -only-testing:AsteraDevTests \
+    -quiet; then
+    echo "pre-push: unit tests failed. Push blocked. Use --no-verify to override." >&2
+    exit 1
+fi
