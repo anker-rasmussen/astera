@@ -774,6 +774,7 @@ struct SettingsView: View {
         }
         .buttonStyle(.plain)
         .disabled(isExporting)
+        .accessibilityIdentifier("settings.data.export")
     }
 
     private var deleteRow: some View {
@@ -806,6 +807,7 @@ struct SettingsView: View {
         }
         .buttonStyle(.plain)
         .disabled(isErasing)
+        .accessibilityIdentifier("settings.data.delete")
     }
 
     private func buildAndShareExport() {
@@ -938,6 +940,7 @@ struct ExportShareView: View {
             HStack {
                 Button("Done", action: onDismiss)
                     .buttonStyle(AsteraGhostButtonStyle())
+                    .accessibilityIdentifier("export.done")
                 Spacer()
             }
             VStack(alignment: .leading, spacing: AsteraSpacing.sm) {
@@ -945,7 +948,7 @@ struct ExportShareView: View {
                 Text("Saved.")
                     .font(.asteraSerif(28, weight: .medium))
                     .foregroundStyle(AsteraColor.ink)
-                Text("Open the file or share it from here. It's a plain-text JSON that any text editor can read.")
+                Text("Open the file or share it from here. It's a PDF any reader can open, and you can print it or send it to a clinician.")
                     .font(.asteraSerifItalic(14))
                     .foregroundStyle(AsteraColor.iron)
                     .lineSpacing(2)
