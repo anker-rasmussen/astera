@@ -1,0 +1,26 @@
+name: Checks
+
+# Guards against the same fact being written down twice and the copies disagreeing. Both scripts
+# are plain Python with no dependencies, so this needs no toolchain beyond the runner's python3.
+#
+# Deliberately not part of the Xcode Cloud build: a failure here should block a merge, not an
+# archive you are trying to ship.
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  consistency:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # The privacy policy is published in three places from one source file.
+      - name: Privacy artifacts are current
+        run: python3 scripts/build_privacy.py --check
+
+      # Product IDs, prices, durations, legal URLs, and the shipping version are restated in the
+      # App Store paperwork. They have to match what the app declares.
+      - name: App Store metadata matches the app
+        run: python3 scripts/check_consistency.py
