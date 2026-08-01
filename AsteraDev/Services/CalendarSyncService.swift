@@ -62,14 +62,28 @@ enum CalendarSyncService {
         let upcoming: Period?
     }
 
-    /// Build a snapshot of past bleed clusters + upcoming prediction. Run on the main actor; pass the payload to `sync(_:)`.
-    /// Pass `predictsPeriods: false` to omit the upcoming-period event (pregnancy / post-loss / postpartum modes).
+    /// Build a snapshot of the upcoming prediction, and past bleed clusters if the user asked for
+    /// them. Run on the main actor; pass the payload to `sync(_:)`.
+    ///
+    /// Pass `predictsPeriods: false` to omit the upcoming-period event (pregnancy / post-loss /
+    /// postpartum modes).
+    ///
+    /// `includePastPeriods` defaults to false, and the default is the point. A calendar is the one
+    /// place Astera's data leaves the app: it can sync to a work account, a shared family
+    /// calendar, or a partner's phone. A forecast of one upcoming period is a small thing to find
+    /// there. Two years of logged bleeds is not, and it is not what someone turning on a toggle
+    /// labelled "add your periods to a calendar" is likely to have pictured.
     @MainActor
-    static func makePayload(cycles: [Cycle], prediction: PeriodPrediction, predictsPeriods: Bool = true) -> SyncPayload {
+    static func makePayload(
+        cycles: [Cycle],
+        prediction: PeriodPrediction,
+        predictsPeriods: Bool = true,
+        includePastPeriods: Bool = false
+    ) -> SyncPayload {
         let cal = Calendar.current
         var past: [SyncPayload.Period] = []
 
-        for cycle in cycles {
+        for cycle in includePastPeriods ? cycles : [] {
             let bleedDays = (cycle.flowEntries ?? [])
                 .filter { $0.intensity.rawValue >= FlowIntensity.light.rawValue }
                 .map { cal.startOfDay(for: $0.day) }
@@ -102,7 +116,7 @@ enum CalendarSyncService {
             upcoming = SyncPayload.Period(
                 start: cal.startOfDay(for: prediction.lowerBound),
                 end: cal.startOfDay(for: prediction.upperBound),
-                title: "Period expected",
+                title: PeriodPrediction.expectedLabel,
                 notes: "\(asteraNoteMarker)\n\nFrom Astera. \(prediction.confidenceLabel). Estimates only, not medical advice."
             )
         } else {
@@ -153,7 +167,7 @@ enum CalendarSyncService {
             upcoming: .init(
                 start: Calendar.current.startOfDay(for: prediction.lowerBound),
                 end: Calendar.current.startOfDay(for: prediction.upperBound),
-                title: "Period expected",
+                title: PeriodPrediction.expectedLabel,
                 notes: "\(asteraNoteMarker)\n\nFrom Astera. \(prediction.confidenceLabel). Estimates only, not medical advice."
             )
         )

@@ -108,7 +108,7 @@ struct FirstPredictionStep: View {
                 Hairline()
 
                 VStack(alignment: .leading, spacing: AsteraSpacing.md) {
-                    CapsLabel(text: "Period expected")
+                    CapsLabel(text: PeriodPrediction.expectedLabel)
                     Text(prediction.rangeText)
                         .font(.asteraNumeric(44, weight: .medium))
                         .foregroundStyle(AsteraColor.ink)

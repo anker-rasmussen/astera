@@ -74,3 +74,10 @@ enum SimplePredictor {
         return max(1, days + 1)
     }
 }
+
+extension PeriodPrediction {
+    /// The heading Astera puts on a predicted period: on Home, at the end of onboarding, and on
+    /// the event it writes into the user's own Calendar. One phrase, because someone who meets it
+    /// in two of those places should not have to work out whether they mean the same thing.
+    static let expectedLabel = "Period expected"
+}

@@ -80,4 +80,28 @@ struct EraseServiceTests {
         #expect(flow.isEmpty)
         #expect(symptoms.isEmpty)
     }
+
+    /// The delete screen promises "every cycle, symptom, note, and setting", and the privacy
+    /// policy cites this button as the user's right to erasure. Settings were the part that was
+    /// not true: `EraseService` wiped a hand-written list of six keys while the app had ten, so
+    /// the four logging preferences survived, including whether sexual-activity logging was on.
+    ///
+    /// This drives every key from `allCases`, so adding a preference and forgetting to erase it
+    /// fails here rather than in someone's hands.
+    @Test("Erase clears every stored setting, not a hand-picked few")
+    @MainActor
+    func wipesEverySetting() async throws {
+        let container = try PersistenceController.makeContainer(inMemory: true)
+        let defaults = UserDefaults.standard
+
+        // Put every key into a non-default state so a surviving one is unambiguous.
+        for key in AppStorageKey.allCases {
+            defaults.set(true, forKey: key.rawValue)
+        }
+
+        await EraseService.eraseEverything(context: container.mainContext)
+
+        let survivors = AppStorageKey.allCases.filter { defaults.object(forKey: $0.rawValue) != nil }
+        #expect(survivors.isEmpty, "Settings that outlived \"delete everything\": \(survivors.map(\.rawValue))")
+    }
 }

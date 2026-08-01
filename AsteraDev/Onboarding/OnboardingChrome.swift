@@ -168,6 +168,8 @@ struct HairlineRow<Trailing: View>: View {
     let title: String
     let subtitle: String?
     let isSelected: Bool
+    /// Optional, because the rows that are not a choice between options have nothing to select.
+    let identifier: String?
     let action: () -> Void
     @ViewBuilder let trailing: () -> Trailing
 
@@ -175,12 +177,14 @@ struct HairlineRow<Trailing: View>: View {
         title: String,
         subtitle: String? = nil,
         isSelected: Bool,
+        identifier: String? = nil,
         action: @escaping () -> Void,
         @ViewBuilder trailing: @escaping () -> Trailing = { EmptyView() }
     ) {
         self.title = title
         self.subtitle = subtitle
         self.isSelected = isSelected
+        self.identifier = identifier
         self.action = action
         self.trailing = trailing
     }
@@ -215,6 +219,10 @@ struct HairlineRow<Trailing: View>: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        // Rows that are not a choice fall back to the empty identifier they would have had anyway.
+        .accessibilityIdentifier(identifier ?? "")
+        // Lets a test read which option is selected instead of inferring it from the copy.
+        .accessibilityAddTraits(isSelected ? [.isSelected] : [])
     }
 }
 

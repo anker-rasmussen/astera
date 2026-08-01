@@ -45,14 +45,7 @@ struct LockedView: View {
     }
 
     private var unlockLabel: String {
-        if isAuthenticating { return "Unlocking…" }
-        switch biometry {
-        case .faceID: return "Unlock with Face ID"
-        case .touchID: return "Unlock with Touch ID"
-        case .opticID: return "Unlock with Optic ID"
-        case .passcodeOnly: return "Unlock with passcode"
-        case .unavailable: return "Unlock"
-        }
+        isAuthenticating ? "Unlocking…" : biometry.unlockLabel
     }
 
     private func attempt() {

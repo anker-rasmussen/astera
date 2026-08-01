@@ -109,7 +109,9 @@ def check_disclosure_tests(products):
     """
     text = DISCLOSURE_TESTS.read_text()
     for product_id, _, _, name in products:
-        if f'productID: "{product_id}"' not in text:
+        # Match the quoted ID anywhere rather than a particular call site, so reformatting or
+        # renaming the helper's argument label cannot silently disarm the guard.
+        if f'"{product_id}"' not in text:
             fail(
                 f"{rel(DISCLOSURE_TESTS)} has no disclosure test for {name} (product "
                 f"{product_id}). Apple requires the title, length, and price of every product."

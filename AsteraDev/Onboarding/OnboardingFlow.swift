@@ -134,10 +134,17 @@ struct OnboardingFlow: View {
     }
 }
 
-enum AppStorageKey: String {
+/// `CaseIterable` is load-bearing, not convenience: `EraseService` wipes `allCases`, and the list
+/// it wiped used to be written out by hand. Four keys had been added since and none of them were
+/// on it, so "wipes every setting" quietly left the logging preferences behind, including whether
+/// sexual-activity logging was on, which is itself something a person may be erasing.
+enum AppStorageKey: String, CaseIterable {
     case hasCompletedOnboarding
     case requiresAppLock
     case showInCalendar
+    /// Whether the calendar gets your logged periods as well as the predicted one. Default false:
+    /// a calendar can be shared, and history there says a great deal more than a forecast does.
+    case includePastPeriodsInCalendar
     case syncToHealth
     case notifyPeriodInThreeDays
     case notifyPeriodToday

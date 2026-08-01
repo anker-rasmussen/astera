@@ -4,6 +4,7 @@ import SwiftData
 struct HomeView: View {
     @Environment(\.modelContext) private var modelContext
     @AppStorage(AppStorageKey.showInCalendar.rawValue) private var showInCalendar: Bool = false
+    @AppStorage(AppStorageKey.includePastPeriodsInCalendar.rawValue) private var includePastPeriodsInCalendar: Bool = false
     @AppStorage(AppStorageKey.notifyPeriodInThreeDays.rawValue) private var notifyPeriodInThreeDays: Bool = false
     @AppStorage(AppStorageKey.notifyPeriodToday.rawValue) private var notifyPeriodToday: Bool = false
     @Query(sort: \UserProfile.createdAt, order: .reverse) private var profiles: [UserProfile]
@@ -148,7 +149,8 @@ struct HomeView: View {
         let payload = CalendarSyncService.makePayload(
             cycles: Array(cycles),
             prediction: prediction,
-            predictsPeriods: predicts
+            predictsPeriods: predicts,
+            includePastPeriods: includePastPeriodsInCalendar
         )
         Task.detached {
             try? CalendarSyncService.sync(payload)
@@ -242,7 +244,7 @@ struct HomeView: View {
             showWhySheet = true
         } label: {
             VStack(alignment: .leading, spacing: AsteraSpacing.md) {
-                CapsLabel(text: "Period expected")
+                CapsLabel(text: PeriodPrediction.expectedLabel)
                 Text(prediction.rangeText)
                     .font(.asteraNumeric(38, weight: .medium))
                     .foregroundStyle(AsteraColor.ink)

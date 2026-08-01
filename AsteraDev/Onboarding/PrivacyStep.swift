@@ -11,15 +11,7 @@ struct PrivacyStep: View {
 
     private var biometry: AppLockService.BiometryKind { AppLockService.availableBiometry }
 
-    private var lockOptionLabel: String {
-        switch biometry {
-        case .faceID: return "Lock with Face ID"
-        case .touchID: return "Lock with Touch ID"
-        case .opticID: return "Lock with Optic ID"
-        case .passcodeOnly: return "Lock with your passcode"
-        case .unavailable: return "Lock (not available on this phone)"
-        }
-    }
+    private var lockOptionLabel: String { biometry.lockToggleLabel }
 
     private var lockSubtitle: String {
         switch biometry {

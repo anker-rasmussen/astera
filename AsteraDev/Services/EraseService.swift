@@ -14,9 +14,9 @@ enum EraseService {
         deleteAll(of: UserProfile.self, in: context)
         try? context.save()
 
-        // AppStorage flags: clear every key we know about.
+        // AppStorage flags: every one of them, from the enum rather than a hand-kept list.
         let defaults = UserDefaults.standard
-        for key in AppStorageKey.allKnown {
+        for key in AppStorageKey.allCases {
             defaults.removeObject(forKey: key.rawValue)
         }
 
@@ -31,15 +31,3 @@ enum EraseService {
     }
 }
 
-extension AppStorageKey {
-    static var allKnown: [AppStorageKey] {
-        [
-            .hasCompletedOnboarding,
-            .requiresAppLock,
-            .showInCalendar,
-            .syncToHealth,
-            .notifyPeriodInThreeDays,
-            .notifyPeriodToday
-        ]
-    }
-}

@@ -6,20 +6,13 @@ struct PronounsStep: View {
     let onSkip: () -> Void
     let onContinue: () -> Void
 
-    private let options: [(Pronouns, String, String)] = [
-        (.sheHer, "she / her", "She is on day 14 of her cycle."),
-        (.heHim, "he / him", "He is on day 14 of his cycle."),
-        (.theyThem, "they / them", "They are on day 14 of their cycle."),
-        (.custom, "something else", "Tell us what fits.")
-    ]
-
     private var canContinue: Bool {
         draft.pronouns != .custom || !draft.customPronouns.trimmingCharacters(in: .whitespaces).isEmpty
     }
 
     var body: some View {
         OnboardingScaffold(
-            title: "What words should we use?",
+            title: Pronouns.question,
             subtitle: "We'll only use what you pick. Nothing assumed.",
             currentStep: .pronouns,
             canContinue: canContinue,
@@ -28,12 +21,13 @@ struct PronounsStep: View {
             onContinue: onContinue
         ) {
             HairlineList {
-                ForEach(Array(options.enumerated()), id: \.element.0) { _, option in
+                ForEach(Pronouns.choices) { option in
                     HairlineRow(
-                        title: option.1,
-                        subtitle: option.2,
-                        isSelected: draft.pronouns == option.0,
-                        action: { draft.pronouns = option.0 }
+                        title: option.title,
+                        subtitle: option.subtitle,
+                        isSelected: draft.pronouns == option.value,
+                        identifier: option.accessibilityID,
+                        action: { draft.pronouns = option.value }
                     )
                     Hairline()
                 }

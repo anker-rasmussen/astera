@@ -5,6 +5,7 @@ struct SettingsView: View {
     @Environment(\.modelContext) private var modelContext
     @AppStorage(AppStorageKey.requiresAppLock.rawValue) private var requiresAppLock: Bool = false
     @AppStorage(AppStorageKey.showInCalendar.rawValue) private var showInCalendar: Bool = false
+    @AppStorage(AppStorageKey.includePastPeriodsInCalendar.rawValue) private var includePastPeriodsInCalendar: Bool = false
     @AppStorage(AppStorageKey.syncToHealth.rawValue) private var syncToHealth: Bool = false
     @AppStorage(AppStorageKey.notifyPeriodInThreeDays.rawValue) private var notifyPeriodInThreeDays: Bool = false
     @AppStorage(AppStorageKey.notifyPeriodToday.rawValue) private var notifyPeriodToday: Bool = false
@@ -122,29 +123,15 @@ struct SettingsView: View {
     }
 
     private var pronounsValue: String {
-        guard let profile else { return "they / them" }
+        guard let profile else { return Pronouns.theyThem.summary }
         if profile.pronouns == .custom, let custom = profile.customPronouns, !custom.isEmpty {
             return custom
         }
-        switch profile.pronouns {
-        case .sheHer: return "she / her"
-        case .heHim: return "he / him"
-        case .theyThem: return "they / them"
-        case .custom: return "your own words"
-        }
-    }
-
-    private var salutationValue: String {
-        profile?.homeGreeting ?? "Hello."
+        return profile.pronouns.summary
     }
 
     private var relationshipValue: String {
-        switch profile?.relationshipStructure ?? .single {
-        case .single: return "solo"
-        case .partneredTracking: return "a partner who tracks too"
-        case .partneredNotTracking: return "a partner who doesn't"
-        case .polyamorous: return "polyamorous"
-        }
+        (profile?.relationshipStructure ?? .single).summary
     }
 
     // MARK: - Lock
@@ -272,7 +259,9 @@ struct SettingsView: View {
                     .fixedSize(horizontal: false, vertical: true)
                     .lineSpacing(2)
             } else if result.daysImported == 0 {
-                Text("Already up to date. Astera has every day Apple Health has.")
+                // Not "Astera has every day Apple Health has": days Apple Health records with an
+                // unspecified intensity are skipped on the way in, so that would not be true.
+                Text("Already up to date. Nothing new to bring across.")
                     .font(.asteraSerifItalic(14))
                     .foregroundStyle(AsteraColor.iron)
                     .fixedSize(horizontal: false, vertical: true)
@@ -370,15 +359,7 @@ struct SettingsView: View {
         )
     }
 
-    private var lockToggleTitle: String {
-        switch biometry {
-        case .faceID: return "Lock with Face ID"
-        case .touchID: return "Lock with Touch ID"
-        case .opticID: return "Lock with Optic ID"
-        case .passcodeOnly: return "Lock with your passcode"
-        case .unavailable: return "Lock (not available on this phone)"
-        }
-    }
+    private var lockToggleTitle: String { biometry.lockToggleLabel }
 
     private var lockToggleSubtitle: String {
         switch biometry {
@@ -413,7 +394,7 @@ struct SettingsView: View {
             VStack(alignment: .leading, spacing: AsteraSpacing.md) {
                 Toggle(isOn: calendarBinding) {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Add predicted periods to a calendar")
+                        Text("Add your periods to a calendar")
                             .font(.asteraSerif(17, weight: .regular))
                             .foregroundStyle(AsteraColor.ink)
                         Text("Astera makes one dedicated calendar, separate from your other ones, and adds your next predicted period to it. It updates whenever your pattern changes, and never touches anything else.")
@@ -427,6 +408,28 @@ struct SettingsView: View {
                 .disabled(calendarPending)
                 .accessibilityIdentifier("settings.calendar.toggle")
 
+                // Only offered once the calendar is on, because it is meaningless before that,
+                // and off by default. History in a calendar is a different disclosure from a
+                // forecast: it can be read by anyone the calendar is shared with, and it says
+                // when you bled for as long as you have been logging.
+                if showInCalendar {
+                    Hairline()
+                    Toggle(isOn: pastPeriodsBinding) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Include your past periods too")
+                                .font(.asteraSerif(17, weight: .regular))
+                                .foregroundStyle(AsteraColor.ink)
+                            Text("Off by default. Turning it on adds every period you've logged, as all-day events. Useful if you want the whole picture in one place, worth a thought if this calendar is shared with anyone.")
+                                .font(.asteraSerifItalic(14))
+                                .foregroundStyle(AsteraColor.iron)
+                                .lineSpacing(2)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                    }
+                    .tint(AsteraColor.accent)
+                    .accessibilityIdentifier("settings.calendar.includePast")
+                }
+
                 if calendarFailed {
                     Text("Calendar access wasn't given. Open the Settings app → Astera → Calendars to allow it.")
                         .font(.asteraSerifItalic(13))
@@ -436,6 +439,19 @@ struct SettingsView: View {
                 }
             }
         }
+    }
+
+    /// Turning this off has to remove the past events already written, not just stop writing new
+    /// ones. `syncCurrentPrediction` replaces everything Astera owns on each run, so re-syncing
+    /// with the flag off is what takes them back out.
+    private var pastPeriodsBinding: Binding<Bool> {
+        Binding(
+            get: { includePastPeriodsInCalendar },
+            set: { wantsOn in
+                includePastPeriodsInCalendar = wantsOn
+                syncCurrentPrediction()
+            }
+        )
     }
 
     private var calendarBinding: Binding<Bool> {
@@ -486,7 +502,11 @@ struct SettingsView: View {
             observedLengths: cycles.observedLengths,
             cycleMode: profile?.cycleMode ?? .notSure
         )
-        let payload = CalendarSyncService.makePayload(cycles: Array(cycles), prediction: prediction)
+        let payload = CalendarSyncService.makePayload(
+            cycles: Array(cycles),
+            prediction: prediction,
+            includePastPeriods: includePastPeriodsInCalendar
+        )
         Task.detached {
             try? CalendarSyncService.sync(payload)
         }
