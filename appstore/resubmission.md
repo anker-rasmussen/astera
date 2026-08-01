@@ -20,6 +20,24 @@ Two rejections came back together. They resolve through **different mechanisms**
 
 ## Order of operations
 
+### 0. Confirm the three prices App Store Connect actually holds
+
+Do this first, because the Description and the review notes both state prices in GBP and a mismatch there is a fresh 3.1.2 rejection rather than a fix.
+
+`scripts/check_consistency.py` only proves the repo agrees with `AsteraPlus.storekit`, and that file is a **local mock for the simulator**. It has no connection to App Store Connect and its storefront is set to USA. A green check says the paperwork is self-consistent, not that Apple holds these numbers.
+
+In App Store Connect, Monetization → In-App Purchases, open each product and read the GBP row of the price table:
+
+- [ ] 000 Astera+ Monthly is **£0.49**
+- [ ] 001 Astera+ Yearly is **£4.99**
+- [ ] 002 Astera+ Lifetime is **£15.00**, not £14.99
+
+£15.00 is a valid granular price point, but the older tier grid rounds to £14.99, so a product created before a custom price was chosen may well sit there. If any of the three disagree, either change the price in App Store Connect or change the number in the repo. App Store Connect is the authority. The repo restates these prices in three places, all of which `check_consistency.py` guards:
+
+- `appstore/listing.md` (Description, and the subscription terms paragraph)
+- `appstore/review-notes.md`
+- `AsteraDev/Resources/AsteraPlus.storekit`
+
 ### 1. In App Store Connect: get the three IAPs to Ready to Submit
 
 This is the whole of 2.1(b). Product IDs and copy are in `appstore/iap.md`.
@@ -47,7 +65,7 @@ Products can sit at Ready to Submit indefinitely without being part of the submi
 
 ### 4. Build and upload
 
-- [ ] Bump `CFBundleVersion` in `AsteraDev/Info.plist` (1 → 2). `CFBundleShortVersionString` stays `1.0`.
+- [x] `CFBundleVersion` in `AsteraDev/Info.plist` is now `2`. `CFBundleShortVersionString` stays `1.0`. Bump it again for every further upload, even a rejected one: App Store Connect refuses a build number it has already seen.
 - [ ] Archive and upload, attach the build to the version
 
 ### 5. Record the screen recording
