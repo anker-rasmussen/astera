@@ -26,6 +26,8 @@ Do this first, because the Description and the review notes both state prices in
 
 `scripts/check_consistency.py` only proves the repo agrees with `AsteraPlus.storekit`, and that file is a **local mock for the simulator**. It has no connection to App Store Connect and its storefront is set to USA. A green check says the paperwork is self-consistent, not that Apple holds these numbers.
 
+The simulator is not a second opinion either. `AsteraPlus.storekit` sets the lifetime tier to `15.00`, and the running app renders **`$14.99`**: StoreKit's local test framework snaps `displayPrice` to a price point it recognises, and `$15.00` is not one of them. `0.49` and `4.99` come through untouched only because they are canonical tier prices. This is worth knowing for two reasons. It means a local run can neither confirm nor refute £15.00, and it means the screen recording in step 5 must not be made on a simulator, or it will show a price that contradicts the Description.
+
 In App Store Connect, Monetization → In-App Purchases, open each product and read the GBP row of the price table:
 
 - [ ] 000 Astera+ Monthly is **£0.49**
@@ -70,7 +72,9 @@ Products can sit at Ready to Submit indefinitely without being part of the submi
 
 ### 5. Record the screen recording
 
-Do this on the uploaded build, not on a simulator running older code. Apple asks for a recording that confirms the disclosures. One continuous take, no cuts:
+**Record on a real device running the TestFlight build, never on a simulator.** Two reasons, and the second is easy to miss: a simulator may be running older code, and its StoreKit prices are local mock values that do not match App Store Connect. The lifetime tier renders as `$14.99` on the simulator regardless of what the config says, which would put a price on Apple's screen that contradicts the one in the Description, in a recording submitted to answer a pricing-disclosure rejection.
+
+Apple asks for a recording that confirms the disclosures. One continuous take, no cuts:
 
 1. Open the app, go to Settings
 2. Scroll to Astera+ and tap in

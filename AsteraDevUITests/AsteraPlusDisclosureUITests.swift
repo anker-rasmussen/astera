@@ -24,6 +24,37 @@ final class AsteraPlusDisclosureUITests: AsteraUITestCase {
         return row.label
     }
 
+    /// Asserts the row shows a real, formatted price rather than a placeholder or an empty string.
+    ///
+    /// Deliberately a shape check, not an exact number. `AsteraPlus.storekit` says the lifetime
+    /// tier is `15.00`, and the simulator renders `$14.99`: StoreKit's local test framework snaps
+    /// `displayPrice` to a price point it recognises, and `$15.00` is not one. `0.49` and `4.99`
+    /// survive only because they happen to be canonical tier prices.
+    ///
+    /// So an exact assertion here would be testing Apple's price table, and it would test it
+    /// against a local mock that has no connection to App Store Connect. What Astera is
+    /// responsible for is rendering whatever StoreKit hands back, in the storefront's own
+    /// currency. Whether that number is the intended one is a question only App Store Connect can
+    /// answer; step 0 of `appstore/resubmission.md` is where that gets checked.
+    ///
+    /// The pattern assumes a `.` decimal separator, which holds for the `en_US` storefront the
+    /// suite runs under. A locale that formats `0,49 €` would need it widened.
+    private func assertShowsAFormattedPrice(
+        _ label: String,
+        _ what: String,
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) {
+        let price = try! NSRegularExpression(pattern: #"[^\s\d](\d{1,3}(,\d{3})*|\d+)\.\d{2}"#)
+        let range = NSRange(label.startIndex..., in: label)
+        XCTAssertNotNil(
+            price.firstMatch(in: label, range: range),
+            "\(what) must show a currency-formatted price. Label was: \(label)",
+            file: file,
+            line: line
+        )
+    }
+
     // MARK: - Title, length, price
 
     func testMonthlyRowStatesTitleLengthPriceAndRenewal() {
@@ -32,7 +63,7 @@ final class AsteraPlusDisclosureUITests: AsteraUITestCase {
 
         XCTAssertTrue(label.localizedCaseInsensitiveContains("astera+ monthly"), "Missing title. Label was: \(label)")
         XCTAssertTrue(label.localizedCaseInsensitiveContains("a month"), "Missing subscription length. Label was: \(label)")
-        XCTAssertTrue(label.contains("0.49"), "Missing price. Label was: \(label)")
+        assertShowsAFormattedPrice(label, "Astera+ Monthly")
         XCTAssertTrue(
             label.localizedCaseInsensitiveContains("renews automatically"),
             "Monthly must disclose auto-renewal. Label was: \(label)"
@@ -45,7 +76,7 @@ final class AsteraPlusDisclosureUITests: AsteraUITestCase {
 
         XCTAssertTrue(label.localizedCaseInsensitiveContains("astera+ yearly"), "Missing title. Label was: \(label)")
         XCTAssertTrue(label.localizedCaseInsensitiveContains("a year"), "Missing subscription length. Label was: \(label)")
-        XCTAssertTrue(label.contains("4.99"), "Missing price. Label was: \(label)")
+        assertShowsAFormattedPrice(label, "Astera+ Yearly")
         XCTAssertTrue(
             label.localizedCaseInsensitiveContains("renews automatically"),
             "Yearly must disclose auto-renewal. Label was: \(label)"
@@ -54,11 +85,13 @@ final class AsteraPlusDisclosureUITests: AsteraUITestCase {
 
     /// The highest-risk line in the whole screen. Product 002 is a non-consumable: claiming it
     /// renews would be its own rejection, so this asserts the negative explicitly.
+    ///
     func testLifetimeRowNeverClaimsToRenew() {
         let app = openAsteraPlus()
         let label = tierLabel(app, productID: "002")
 
         XCTAssertTrue(label.localizedCaseInsensitiveContains("astera+ lifetime"), "Missing title. Label was: \(label)")
+        assertShowsAFormattedPrice(label, "Astera+ Lifetime")
         XCTAssertFalse(
             label.localizedCaseInsensitiveContains("renews automatically"),
             "Lifetime is a non-consumable and must never claim to renew. Label was: \(label)"

@@ -31,6 +31,8 @@ SERVICE = ROOT / "AsteraDev/Services/AsteraPlusService.swift"
 LINKS = ROOT / "AsteraDev/Resources/AsteraLinks.swift"
 INFO_PLIST = ROOT / "AsteraDev/Info.plist"
 
+DISCLOSURE_TESTS = ROOT / "AsteraDevUITests/AsteraPlusDisclosureUITests.swift"
+
 IAP_DOC = ROOT / "appstore/iap.md"
 LISTING_DOC = ROOT / "appstore/listing.md"
 NOTES_DOC = ROOT / "appstore/review-notes.md"
@@ -96,6 +98,24 @@ def check_durations(products):
             fail(f"{rel(IAP_DOC)} does not state {name}'s duration of {words} ({duration})")
 
 
+def check_disclosure_tests(products):
+    """Every product on sale needs a 3.1.2(c) disclosure test.
+
+    Not the price: the tests assert the shape of a rendered price rather than a literal, because
+    StoreKit's local framework snaps `displayPrice` to its own price points (it renders the
+    lifetime tier's 15.00 as $14.99). What this guards is coverage. Adding a fourth tier without
+    a disclosure test would be silently submittable, and the disclosures are the thing v1.0 was
+    rejected over.
+    """
+    text = DISCLOSURE_TESTS.read_text()
+    for product_id, _, _, name in products:
+        if f'productID: "{product_id}"' not in text:
+            fail(
+                f"{rel(DISCLOSURE_TESTS)} has no disclosure test for {name} (product "
+                f"{product_id}). Apple requires the title, length, and price of every product."
+            )
+
+
 def check_legal_urls():
     """The URLs in the binary and the URLs in the metadata have to be the same strings."""
     urls = dict(re.findall(r'static let (\w+) = URL\(string: "([^"]+)"\)', LINKS.read_text()))
@@ -129,6 +149,7 @@ def main():
     check_tier_ids(products)
     check_prices_and_ids(products)
     check_durations(products)
+    check_disclosure_tests(products)
     check_legal_urls()
     check_version()
 
