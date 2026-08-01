@@ -39,9 +39,10 @@ final class AgeGatingUITests: AsteraUITestCase {
         enable(app, "settings.log.lifestyle")
         openLogSheetFromSettings(app)
 
+        let reachable = allReachableChips(app)
         for chip in ["painful sex", "sex", "protected sex"] {
             XCTAssertFalse(
-                scrollForChip(app, chip),
+                reachable.contains(chip),
                 "The \"\(chip)\" chip must not be reachable for an under-16"
             )
         }
@@ -55,9 +56,10 @@ final class AgeGatingUITests: AsteraUITestCase {
         enable(app, sexualToggle)
         openLogSheetFromSettings(app)
 
+        let reachable = allReachableChips(app)
         for chip in ["painful sex", "sex", "protected sex"] {
             XCTAssertTrue(
-                scrollForChip(app, chip),
+                reachable.contains(chip),
                 "An adult who opted in should be able to reach the \"\(chip)\" chip"
             )
         }
@@ -107,15 +109,22 @@ final class AgeGatingUITests: AsteraUITestCase {
         app.buttons["profileEdit.save"].requireExistence("the Save button").tap()
     }
 
-    /// Chips render lazily, so reaching one means scrolling the sheet until it appears.
-    /// Returns whether it ever did.
-    private func scrollForChip(_ app: XCUIApplication, _ label: String, maxSwipes: Int = 12) -> Bool {
-        let chip = app.buttons[label]
-        for _ in 0..<maxSwipes {
-            if chip.exists { return true }
+    /// Every chip label reachable by scrolling the sheet to the bottom.
+    ///
+    /// One pass, collecting as it goes, rather than one full scroll per chip being looked for:
+    /// three sequential searches cost about three times as long and told us the same thing. Stops
+    /// as soon as two consecutive swipes reveal nothing new, so a short sheet is cheap.
+    private func allReachableChips(_ app: XCUIApplication, maxSwipes: Int = 12) -> Set<String> {
+        var seen = Set(app.buttons.allElementsBoundByIndex.map(\.label))
+        var barrenSwipes = 0
+
+        for _ in 0..<maxSwipes where barrenSwipes < 2 {
             app.swipeUp()
+            let now = Set(app.buttons.allElementsBoundByIndex.map(\.label))
+            barrenSwipes = now.subtracting(seen).isEmpty ? barrenSwipes + 1 : 0
+            seen.formUnion(now)
         }
-        return chip.exists
+        return seen
     }
 
     private func enable(_ app: XCUIApplication, _ identifier: String) {

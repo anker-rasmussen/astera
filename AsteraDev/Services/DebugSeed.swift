@@ -24,6 +24,14 @@ enum DebugSeed {
 
     static var isEnabled: Bool { value("ASTERA_FORCE_HOME") == "1" }
 
+    /// Skip the CloudKit-backed container and go straight to the local store.
+    ///
+    /// This changes nothing about what the tests observe: a simulator has no iCloud account, so
+    /// the CloudKit container always fails to initialise and the app already falls back to
+    /// local-only. All this skips is the doomed attempt, plus the mirroring retries it kicks off,
+    /// which cost real seconds on every one of the suite's launches.
+    static var prefersLocalOnlyStore: Bool { value("ASTERA_LOCAL_ONLY") == "1" }
+
     /// Any CycleMode raw value. Driven off the enum rather than a hand-written switch, so a new
     /// mode is testable the moment it exists instead of silently falling back to `.regular`.
     static var mode: CycleMode {

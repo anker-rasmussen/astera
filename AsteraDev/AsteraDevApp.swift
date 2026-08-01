@@ -4,6 +4,11 @@ import SwiftData
 @main
 struct AsteraDevApp: App {
     let modelContainer: ModelContainer = {
+        #if DEBUG
+        if DebugSeed.prefersLocalOnlyStore, let local = try? PersistenceController.makeLocalOnlyContainer() {
+            return local
+        }
+        #endif
         do {
             return try PersistenceController.makeContainer()
         } catch {
