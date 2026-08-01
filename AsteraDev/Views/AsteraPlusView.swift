@@ -34,6 +34,8 @@ struct AsteraPlusView: View {
                     extrasBlock
                     Hairline()
                     promiseBlock
+                    Hairline()
+                    legalBlock
                 }
                 .asteraEditorialMargins()
                 .padding(.top, AsteraSpacing.lg)
@@ -41,6 +43,7 @@ struct AsteraPlusView: View {
             }
         }
         .asteraScreen()
+        .accessibilityIdentifier("asteraPlus.screen")
         .task { await service.refresh() }
     }
 
@@ -169,6 +172,7 @@ struct AsteraPlusView: View {
         }
         .buttonStyle(.plain)
         .disabled(purchasing != nil)
+        .accessibilityIdentifier("asteraPlus.tier.\(product.id)")
     }
 
     private var activeStateBlock: some View {
@@ -231,6 +235,38 @@ struct AsteraPlusView: View {
                 .foregroundStyle(AsteraColor.iron)
                 .lineSpacing(2)
                 .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    /// Required by App Store Guideline 3.1.2(c): the title, length, and price of each
+    /// auto-renewing subscription, plus functional links to the privacy policy and the
+    /// Terms of Use, on the screen where the purchase happens.
+    private var legalBlock: some View {
+        VStack(alignment: .leading, spacing: AsteraSpacing.md) {
+            CapsLabel(text: "The small print")
+
+            Text("Astera+ Monthly and Astera+ Yearly are auto-renewing subscriptions, sold one month and one year at a time at the prices listed above. Payment is charged to your Apple ID when you confirm the purchase. Each renews automatically at the same price unless you turn off auto-renew at least 24 hours before the current period ends. You can manage or cancel in the App Store app, under your Apple ID, in Subscriptions. Astera+ Lifetime is a one-time purchase: it never renews and there is nothing to cancel.")
+                .font(.asteraSerifItalic(13))
+                .foregroundStyle(AsteraColor.iron)
+                .lineSpacing(2)
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier("asteraPlus.smallPrint")
+
+            VStack(alignment: .leading, spacing: AsteraSpacing.sm) {
+                legalLink("Privacy policy", destination: AsteraLinks.privacyPolicy)
+                    .accessibilityIdentifier("asteraPlus.privacyLink")
+                legalLink("Terms of Use (EULA)", destination: AsteraLinks.termsOfUse)
+                    .accessibilityIdentifier("asteraPlus.termsLink")
+            }
+        }
+    }
+
+    private func legalLink(_ title: String, destination: URL) -> some View {
+        Link(destination: destination) {
+            Text(title)
+                .font(.asteraSerifItalic(15))
+                .underline(true, color: AsteraColor.accent.opacity(0.4))
+                .foregroundStyle(AsteraColor.accent)
         }
     }
 

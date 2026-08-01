@@ -23,15 +23,26 @@ When the user opts in, Astera creates a dedicated "Astera" calendar and writes p
 Used for an optional app-level lock. The lock is off by default. The usage string in Info.plist explains the purpose.
 
 6. IN-APP PURCHASES
-Three optional Astera+ products: monthly (£0.50), yearly (£5), lifetime (£30). The full tracker (logging, prediction, history, calendar sync, HealthKit, export, delete, FaceID lock) is free without any purchase. Astera+ is purely a support tier that unlocks cosmetic and convenience features. There is no paywall on core functionality.
+Three optional Astera+ products, all reachable from Settings → Astera+:
+- Astera+ Monthly (product ID 000), auto-renewable subscription, 1 month, £0.49
+- Astera+ Yearly (product ID 001), auto-renewable subscription, 1 year, £4.99
+- Astera+ Lifetime (product ID 002), non-consumable, one-time, £15.00
+All three are submitted with this version. The full tracker (logging, prediction, history, calendar sync, HealthKit, export, delete, Face ID lock) is free without any purchase. Astera+ is purely a support tier that unlocks cosmetic and convenience features. There is no paywall on core functionality.
 
-7. NO MEDICAL CLAIMS
+7. SUBSCRIPTION DISCLOSURES (Guideline 3.1.2(c))
+The Astera+ screen (Settings → Astera+) displays, without scrolling past the offer: the title of each product, its length, and its price. Below the offer, under "The small print", it states that the monthly and yearly products renew automatically at the same price unless auto-renew is turned off at least 24 hours before the period ends, that payment is charged to the Apple ID at confirmation, and where to manage or cancel. It also states that Astera+ Lifetime is a one-time purchase that never renews.
+The same screen carries two functional links, both of which open in Safari:
+- Privacy policy: https://anker-rasmussen.github.io/astera/privacy/
+- Terms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+Astera uses Apple's standard Terms of Use (EULA), not a custom one. The same link is in the App Description, and the License Agreement field is left at Apple's standard agreement.
+
+8. NO MEDICAL CLAIMS
 Predictions are surfaced as estimates with confidence ranges. Language uses "may," "expected," "common." Never diagnostic terms. The privacy policy explicitly states Astera makes no medical claims.
 
-8. AGE GATING
+9. AGE GATING
 Users entering a birth year that puts them under 18 see fertility/TTC content hidden. Users under 16 cannot see sexual-activity logging chips or the corresponding settings toggle. Both gates apply regardless of any toggle state, and toggles are auto-cleared if a birth year change drops them below a gate.
 
-9. PUBLIC PRIVACY POLICY
+10. PUBLIC PRIVACY POLICY
 The privacy policy is hash-committed to a public GitHub repository so every revision is visible in git history:
 https://anker-rasmussen.github.io/astera/privacy/
 Source: https://github.com/anker-rasmussen/astera/blob/main/AsteraDev/Resources/PrivacyPolicy.swift

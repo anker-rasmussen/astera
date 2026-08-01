@@ -46,6 +46,13 @@ https://anker-rasmussen.github.io/astera/
 © 2026 Anker Rasmussen
 ```
 
+**License Agreement (App Information → License Agreement)**
+```
+Leave at Apple's Standard License Agreement. Do not upload a custom EULA.
+```
+
+_Deliberate. We link Apple's standard Terms of Use from the App Description instead, which is the path Apple's own rejection notice offers. Filling in a custom EULA here while also linking the standard one is a contradiction reviewers bounce. If a future version needs bespoke terms, change both at once._
+
 ---
 
 ## Version 1.0 (per-release metadata)
@@ -101,10 +108,17 @@ ASTERA+
 
 The full tracker is free, always. Astera+ exists for people who'd like to support the project and happen to want a few extras (themes, widgets, detailed insights, custom symptoms, and the Apple Watch app on the way). Tip-jar pricing: under 50p a month, under £5 a year, or £15 once for lifetime. Never pushed. There's no paywall on anything you actually need.
 
+Astera+ Monthly is an auto-renewing subscription of one month at £0.49. Astera+ Yearly is an auto-renewing subscription of one year at £4.99. Payment is charged to your Apple ID at confirmation of purchase, and each renews automatically at the same price unless auto-renew is turned off at least 24 hours before the current period ends. Manage or cancel in the App Store app, under your Apple ID, in Subscriptions. Astera+ Lifetime is a one-time purchase of £15.00 and does not renew.
+
+Privacy policy: https://anker-rasmussen.github.io/astera/privacy/
+Terms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+
 Astera makes no medical claims. Predictions are estimates, not advice. If something about your cycle worries you, please talk to a clinician.
 
 Built and maintained by one engineer in the UK.
 ```
+
+> The two URLs above are required by Guideline 3.1.2(c) and must stay in the Description. The same two links appear inside the app on the Astera+ screen, sourced from `AsteraDev/Resources/AsteraLinks.swift`. If either URL changes, change it in both places.
 
 ### Keywords (100 char limit, 95 used. Comma-separated, no spaces.)
 

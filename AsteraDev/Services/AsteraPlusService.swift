@@ -134,25 +134,34 @@ final class AsteraPlusService {
 }
 
 extension Product {
-    /// Human-friendly title for a tier ("Monthly · £3", "Yearly · £20", "Lifetime · £60").
+    /// Title of the product as sold. Matches the App Store Connect display name, which
+    /// Guideline 3.1.2(c) requires us to show alongside the length and price.
     var asteraTierTitle: String {
         switch id {
-        case AsteraPlusService.Tier.monthly.rawValue: return "Monthly"
-        case AsteraPlusService.Tier.yearly.rawValue: return "Yearly"
-        case AsteraPlusService.Tier.lifetime.rawValue: return "Lifetime"
+        case AsteraPlusService.Tier.monthly.rawValue: return "Astera+ Monthly"
+        case AsteraPlusService.Tier.yearly.rawValue: return "Astera+ Yearly"
+        case AsteraPlusService.Tier.lifetime.rawValue: return "Astera+ Lifetime"
         default: return displayName
         }
     }
 
+    /// Length, price, and renewal behaviour, in that order. The two subscriptions say plainly
+    /// that they renew; the lifetime tier is a non-consumable and must never claim otherwise.
     var asteraTierDescription: String {
         switch id {
         case AsteraPlusService.Tier.monthly.rawValue:
-            return "\(displayPrice) a month. Cancel any time, from the App Store."
+            return "\(displayPrice) a month, for one month at a time. Renews automatically each month until you cancel. Cancel any time, from the App Store."
         case AsteraPlusService.Tier.yearly.rawValue:
-            return "\(displayPrice) a year. A small discount on the monthly price."
+            return "\(displayPrice) a year, for one year at a time. Renews automatically each year until you cancel. A small discount on the monthly price."
         case AsteraPlusService.Tier.lifetime.rawValue:
-            return "\(displayPrice) once. Astera+ for as long as the app exists. No renewals."
+            return "\(displayPrice) once. Astera+ for as long as the app exists. A one-time purchase, not a subscription: it never renews and there is nothing to cancel."
         default: return displayPrice
         }
+    }
+
+    /// True for the two auto-renewing tiers. Drives the renewal wording so the non-consumable
+    /// lifetime tier can never inherit subscription copy.
+    var asteraIsSubscription: Bool {
+        id == AsteraPlusService.Tier.monthly.rawValue || id == AsteraPlusService.Tier.yearly.rawValue
     }
 }

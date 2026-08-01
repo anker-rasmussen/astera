@@ -846,6 +846,7 @@ struct SettingsView: View {
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
+            .accessibilityIdentifier("settings.asteraPlus")
         }
         .sheet(isPresented: $showAsteraPlus) {
             AsteraPlusView(onDismiss: { showAsteraPlus = false })
@@ -884,7 +885,7 @@ struct SettingsView: View {
 
                 HStack(spacing: 6) {
                     Circle().fill(AsteraColor.accent.opacity(0.4)).frame(width: 6, height: 6)
-                    Text("Astera · version 0.1 · early days")
+                    Text("Astera · version \(Self.appVersion)")
                         .font(.asteraCaps(11))
                         .tracking(1.4)
                         .foregroundStyle(AsteraColor.iron)
@@ -898,6 +899,14 @@ struct SettingsView: View {
     }
 
     // MARK: - Shared chrome
+
+    /// Reads the shipping version out of the bundle so the footer can never contradict the
+    /// build a reviewer is looking at.
+    private static var appVersion: String {
+        let short = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0"
+        let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "1"
+        return "\(short) (\(build))"
+    }
 
     private func section<Content: View>(title: String, @ViewBuilder content: @escaping () -> Content) -> some View {
         VStack(alignment: .leading, spacing: AsteraSpacing.md) {

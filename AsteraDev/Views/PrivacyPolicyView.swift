@@ -23,7 +23,7 @@ struct PrivacyPolicyView: View {
                         Text("The whole promise.")
                             .font(.asteraSerif(34, weight: .medium))
                             .foregroundStyle(AsteraColor.ink)
-                        Text("Plain English. Under 600 words. Last updated \(PrivacyPolicy.lastUpdated).")
+                        Text("Plain English. Version \(PrivacyPolicy.version), last updated \(PrivacyPolicy.lastUpdated).")
                             .font(.asteraSerifItalic(14))
                             .foregroundStyle(AsteraColor.iron)
                             .fixedSize(horizontal: false, vertical: true)
