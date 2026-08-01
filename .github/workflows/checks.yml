@@ -57,6 +57,10 @@ jobs:
           echo "Using simulator: $DEVICE"
           echo "device=$DEVICE" >> "$GITHUB_OUTPUT"
 
+      # Code signing is deliberately left enabled. Simulator builds sign ad-hoc and need no
+      # certificate, and the entitlements that signing applies are what let CoreData+CloudKit
+      # initialise. Disabling it made the app trap on launch before a single unit test ran.
+      #
       # One worker: the hosted runner has less RAM than a laptop, and each parallel worker is a
       # full simulator clone. Locally, two workers is fastest; see scripts/run_tests.sh.
       - name: Test
@@ -67,7 +71,6 @@ jobs:
             -destination "platform=iOS Simulator,name=${{ steps.sim.outputs.device }}" \
             -parallel-testing-enabled NO \
             -resultBundlePath TestResults.xcresult \
-            CODE_SIGNING_ALLOWED=NO \
             | xcpretty && exit ${PIPESTATUS[0]}
 
       # The bundle holds the failure screenshots XCUITest captures automatically, which is the

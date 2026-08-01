@@ -107,7 +107,6 @@ final class DataRightsUITests: AsteraUITestCase {
         app.staticTexts["Astera."].requireExistence("the welcome screen after erasing")
 
         let relaunched = XCUIApplication()
-        relaunched.launchEnvironment["ASTERA_LOCAL_ONLY"] = "1"
         relaunched.launch()
 
         relaunched.staticTexts["Astera."]

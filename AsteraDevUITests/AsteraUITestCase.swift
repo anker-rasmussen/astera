@@ -32,7 +32,6 @@ class AsteraUITestCase: XCTestCase {
     ) -> XCUIApplication {
         let app = XCUIApplication()
         app.launchEnvironment["ASTERA_FORCE_HOME"] = "1"
-        app.launchEnvironment["ASTERA_LOCAL_ONLY"] = "1"
         app.launchEnvironment["ASTERA_INITIAL_TAB"] = tab.rawValue
         app.launchEnvironment["ASTERA_SEED_MODE"] = mode.rawValue
         if let birthYear { app.launchEnvironment["ASTERA_SEED_BIRTH_YEAR"] = String(birthYear) }
@@ -46,7 +45,6 @@ class AsteraUITestCase: XCTestCase {
     @discardableResult
     func launchFreshInstall() -> XCUIApplication {
         let app = XCUIApplication()
-        app.launchEnvironment["ASTERA_LOCAL_ONLY"] = "1"
         app.launch()
         return app
     }

@@ -26,10 +26,12 @@ enum DebugSeed {
 
     /// Skip the CloudKit-backed container and go straight to the local store.
     ///
-    /// This changes nothing about what the tests observe: a simulator has no iCloud account, so
-    /// the CloudKit container always fails to initialise and the app already falls back to
-    /// local-only. All this skips is the doomed attempt, plus the mirroring retries it kicks off,
-    /// which cost real seconds on every one of the suite's launches.
+    /// Not used by the test suites, deliberately: with entitlements present, CloudKit initialises,
+    /// reports no iCloud account, and the app falls back on its own. Letting that happen exercises
+    /// the path a real device without iCloud takes, and measurably costs nothing.
+    ///
+    /// The escape hatch is for an environment where the entitlement is missing. There, asking for
+    /// the CloudKit container does not throw, it traps, and the fallback never gets to run.
     static var prefersLocalOnlyStore: Bool { value("ASTERA_LOCAL_ONLY") == "1" }
 
     /// Any CycleMode raw value. Driven off the enum rather than a hand-written switch, so a new

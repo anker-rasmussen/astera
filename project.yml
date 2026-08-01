@@ -78,13 +78,6 @@ schemes:
         - AsteraDevUITests
       # End-to-end tests drive the real paywall, so they need the local products.
       storeKitConfiguration: AsteraDev/Resources/AsteraPlus.storekit
-      environmentVariables:
-        # Unit tests run inside the app, so the app builds its ModelContainer on launch. Asking
-        # for the CloudKit container without the iCloud entitlement does not throw, it traps, so
-        # on CI (where signing is disabled and there are no entitlements) the host app died before
-        # a single test ran. Local-only from the start avoids that, and costs nothing: no test
-        # here exercises CloudKit, and a simulator has no iCloud account to sync with anyway.
-        ASTERA_LOCAL_ONLY: "1"
     run:
       config: Debug
       # Lets the paywall load Astera+ products locally, so the Astera+ screen can be
