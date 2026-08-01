@@ -118,6 +118,7 @@ struct SettingsView: View {
         }
         .buttonStyle(.plain)
         .disabled(profile == nil)
+        .accessibilityIdentifier("settings.profile.\(field.rawValue)")
     }
 
     private var pronounsValue: String {
@@ -155,7 +156,7 @@ struct SettingsView: View {
         return AgeMode.hideSexualContent(birthYear: p.birthYear)
     }
 
-    private func logToggle(title: String, isOn: Binding<Bool>, body: String) -> some View {
+    private func logToggle(identifier: String, title: String, isOn: Binding<Bool>, body: String) -> some View {
         Toggle(isOn: isOn) {
             VStack(alignment: .leading, spacing: 4) {
                 Text(title)
@@ -169,6 +170,7 @@ struct SettingsView: View {
             }
         }
         .tint(AsteraColor.accent)
+        .accessibilityIdentifier(identifier)
     }
 
     @ViewBuilder
@@ -182,18 +184,21 @@ struct SettingsView: View {
                     .fixedSize(horizontal: false, vertical: true)
 
                 logToggle(
+                    identifier: "settings.log.symptoms",
                     title: "Symptoms",
                     isOn: $showSymptomsLogging,
                     body: "Cramps, mood, sleep, headaches, skin, the works. The richest signal you can give Astera."
                 )
 
                 logToggle(
+                    identifier: "settings.log.lifestyle",
                     title: "Lifestyle",
                     isOn: $showLifestyleLogging,
                     body: "Exercise, alcohol, caffeine, travel, illness, medication, stress. Useful for spotting what might be moving your cycle around."
                 )
 
                 logToggle(
+                    identifier: "settings.log.cravings",
                     title: "Cravings and appetite",
                     isOn: $showCravingsLogging,
                     body: "Sweet, salty, chocolate, carbs, savory, low appetite. Off by default. Anyone navigating an eating disorder may prefer to keep food out of cycle tracking entirely."
@@ -201,6 +206,7 @@ struct SettingsView: View {
 
                 if !hideSexualForTeen {
                     logToggle(
+                        identifier: "settings.log.sexualActivity",
                         title: "Sexual activity",
                         isOn: $showSexualActivity,
                         body: "Adds sex, protected sex, and painful sex. Useful for fertility tracking, intimacy patterns, or pain."

@@ -30,8 +30,10 @@ struct RootView: View {
         .animation(.easeInOut(duration: 0.2), value: isLocked)
         .onAppear {
             #if DEBUG
-            if ProcessInfo.processInfo.environment["ASTERA_FORCE_HOME"] == "1" {
-                seedDemoIfNeeded()
+            if DebugSeed.isEnabled {
+                // Re-seed on every launch, not just an empty store: the previous test's data
+                // survives in the same install, and inheriting it makes assertions meaningless.
+                DebugSeed.apply(in: modelContext)
                 hasCompletedOnboarding = true
             }
             #endif
@@ -59,48 +61,6 @@ struct RootView: View {
         }
     }
 
-    #if DEBUG
-    private func seedDemoIfNeeded() {
-        let seedMode: CycleMode = {
-            switch ProcessInfo.processInfo.environment["ASTERA_SEED_MODE"] {
-            case "pregnant": return .pregnant
-            case "postLoss": return .postLoss
-            case "postpartum": return .postpartum
-            case "pcos": return .pcos
-            case "perimenopause": return .perimenopause
-            default: return .regular
-            }
-        }()
-        let profile = UserProfile(
-            pronouns: .theyThem,
-            salutation: .girl, // demo: warm "Hey, girlie 🌸" greeting
-            relationshipStructure: .single,
-            cycleMode: seedMode,
-            birthYear: 1995
-        )
-        modelContext.insert(profile)
-
-        let calendar = Calendar.current
-        let today = calendar.startOfDay(for: Date())
-
-        // Seed three cycles roughly 28 days apart, with a bleed FlowEntry on each start.
-        for daysAgo in [70, 42, 14] {
-            guard let startDate = calendar.date(byAdding: .day, value: -daysAgo, to: today) else { continue }
-            let cycle = Cycle(startDate: startDate, modeAtStart: .regular)
-            modelContext.insert(cycle)
-
-            // Three bleed days starting from startDate, intensity tapering.
-            let intensities: [FlowIntensity] = [.medium, .medium, .light]
-            for (i, intensity) in intensities.enumerated() {
-                guard let day = calendar.date(byAdding: .day, value: i, to: startDate) else { continue }
-                let flow = FlowEntry(day: day, intensity: intensity, source: .manual)
-                flow.cycle = cycle
-                modelContext.insert(flow)
-            }
-        }
-        try? modelContext.save()
-    }
-    #endif
 }
 
 struct MainTabView: View {

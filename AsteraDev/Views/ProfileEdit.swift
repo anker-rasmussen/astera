@@ -48,6 +48,7 @@ struct EditScaffold<Content: View>: View {
             HStack {
                 Button("Cancel", action: onCancel)
                     .buttonStyle(AsteraGhostButtonStyle())
+                    .accessibilityIdentifier("profileEdit.cancel")
                 Spacer()
                 Button(action: onSave) {
                     HStack(spacing: 4) {
@@ -59,6 +60,7 @@ struct EditScaffold<Content: View>: View {
                 .buttonStyle(AsteraLinkButtonStyle())
                 .disabled(!canSave)
                 .opacity(canSave ? 1 : 0.4)
+                .accessibilityIdentifier("profileEdit.save")
             }
             .asteraEditorialMargins()
             .padding(.top, AsteraSpacing.md)
@@ -387,6 +389,7 @@ struct BirthYearEditView: View {
             VStack(alignment: .leading, spacing: AsteraSpacing.md) {
                 HStack(alignment: .firstTextBaseline, spacing: AsteraSpacing.sm) {
                     TextField("\(profile.birthYear)", text: $text)
+                        .accessibilityIdentifier("profileEdit.birthYear.field")
                         .keyboardType(.numberPad)
                         .focused($focused)
                         .font(.asteraNumeric(48, weight: .medium))
