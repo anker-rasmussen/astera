@@ -7,7 +7,7 @@ paste into App Store Connect, so they stay as prose rather than being generated.
 them instead.
 
 It has caught real drift: review-notes.md claimed £0.50/£5/£30 long after the products moved
-to £0.49/£4.99/£15.00, and that file goes verbatim into the App Review Notes field.
+to £0.49/£4.99/£14.99, and that file goes verbatim into the App Review Notes field.
 
 Sources of truth:
     AsteraDev/Resources/AsteraPlus.storekit   product IDs, types, prices, durations
@@ -102,10 +102,10 @@ def check_disclosure_tests(products):
     """Every product on sale needs a 3.1.2(c) disclosure test.
 
     Not the price: the tests assert the shape of a rendered price rather than a literal, because
-    StoreKit's local framework snaps `displayPrice` to its own price points (it renders the
-    lifetime tier's 15.00 as $14.99). What this guards is coverage. Adding a fourth tier without
-    a disclosure test would be silently submittable, and the disclosures are the thing v1.0 was
-    rejected over.
+    StoreKit's local framework snaps `displayPrice` to its own price points, so the config's
+    number and the rendered number are not the same fact. What this guards is coverage: a tier
+    without a disclosure test would be silently submittable, and the disclosures are the thing
+    v1.0 was rejected over.
     """
     text = DISCLOSURE_TESTS.read_text()
     for product_id, _, _, name in products:

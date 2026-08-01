@@ -26,15 +26,15 @@ Do this first, because the Description and the review notes both state prices in
 
 `scripts/check_consistency.py` only proves the repo agrees with `AsteraPlus.storekit`, and that file is a **local mock for the simulator**. It has no connection to App Store Connect and its storefront is set to USA. A green check says the paperwork is self-consistent, not that Apple holds these numbers.
 
-The simulator is not a second opinion either. `AsteraPlus.storekit` sets the lifetime tier to `15.00`, and the running app renders **`$14.99`**: StoreKit's local test framework snaps `displayPrice` to a price point it recognises, and `$15.00` is not one of them. `0.49` and `4.99` come through untouched only because they are canonical tier prices. This is worth knowing for two reasons. It means a local run can neither confirm nor refute £15.00, and it means the screen recording in step 5 must not be made on a simulator, or it will show a price that contradicts the Description.
+The simulator is not a second opinion either. StoreKit's local test framework snaps `displayPrice` to a price point it recognises, so the number the app renders is not necessarily the number in the config. The lifetime tier was briefly set to a round `15.00` and rendered as `$14.99` regardless. That is why it is 14.99 now, and it is also why the screen recording in step 5 must not be made on a simulator.
 
 In App Store Connect, Monetization → In-App Purchases, open each product and read the GBP row of the price table:
 
 - [ ] 000 Astera+ Monthly is **£0.49**
 - [ ] 001 Astera+ Yearly is **£4.99**
-- [ ] 002 Astera+ Lifetime is **£15.00**, not £14.99
+- [ ] 002 Astera+ Lifetime is **£14.99**
 
-£15.00 is a valid granular price point, but the older tier grid rounds to £14.99, so a product created before a custom price was chosen may well sit there. If any of the three disagree, either change the price in App Store Connect or change the number in the repo. App Store Connect is the authority. The repo restates these prices in three places, all of which `check_consistency.py` guards:
+If any of the three disagree, either change the price in App Store Connect or change the number in the repo. App Store Connect is the authority. The repo restates these prices in three places, all of which `check_consistency.py` guards:
 
 - `appstore/listing.md` (Description, and the subscription terms paragraph)
 - `appstore/review-notes.md`
@@ -72,7 +72,7 @@ Products can sit at Ready to Submit indefinitely without being part of the submi
 
 ### 5. Record the screen recording
 
-**Record on a real device running the TestFlight build, never on a simulator.** Two reasons, and the second is easy to miss: a simulator may be running older code, and its StoreKit prices are local mock values that do not match App Store Connect. The lifetime tier renders as `$14.99` on the simulator regardless of what the config says, which would put a price on Apple's screen that contradicts the one in the Description, in a recording submitted to answer a pricing-disclosure rejection.
+**Record on a real device running the TestFlight build, never on a simulator.** Two reasons, and the second is easy to miss: a simulator may be running older code, and its StoreKit prices come from the local mock in dollars, snapped to whatever price point the test framework recognises. Neither is what a reviewer sees. A recording submitted to answer a pricing-disclosure rejection is the last place to show a price that is not the real one.
 
 Apple asks for a recording that confirms the disclosures. One continuous take, no cuts:
 

@@ -106,9 +106,9 @@ Your data lives on this phone. If you're signed into iCloud, an encrypted copy s
 
 ASTERA+
 
-The full tracker is free, always. Astera+ exists for people who'd like to support the project and happen to want a few extras (themes, widgets, detailed insights, custom symptoms, and the Apple Watch app on the way). Tip-jar pricing: under 50p a month, under £5 a year, or £15 once for lifetime. Never pushed. There's no paywall on anything you actually need.
+The full tracker is free, always. Astera+ exists for people who'd like to support the project and happen to want a few extras (themes, widgets, detailed insights, custom symptoms, and the Apple Watch app on the way). Tip-jar pricing: under 50p a month, under £5 a year, or £14.99 once for lifetime. Never pushed. There's no paywall on anything you actually need.
 
-Astera+ Monthly is an auto-renewing subscription of one month at £0.49. Astera+ Yearly is an auto-renewing subscription of one year at £4.99. Payment is charged to your Apple ID at confirmation of purchase, and each renews automatically at the same price unless auto-renew is turned off at least 24 hours before the current period ends. Manage or cancel in the App Store app, under your Apple ID, in Subscriptions. Astera+ Lifetime is a one-time purchase of £15.00 and does not renew.
+Astera+ Monthly is an auto-renewing subscription of one month at £0.49. Astera+ Yearly is an auto-renewing subscription of one year at £4.99. Payment is charged to your Apple ID at confirmation of purchase, and each renews automatically at the same price unless auto-renew is turned off at least 24 hours before the current period ends. Manage or cancel in the App Store app, under your Apple ID, in Subscriptions. Astera+ Lifetime is a one-time purchase of £14.99 and does not renew.
 
 Privacy policy: https://anker-rasmussen.github.io/astera/privacy/
 Terms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/

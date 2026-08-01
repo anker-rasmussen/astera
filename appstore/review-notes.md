@@ -26,7 +26,7 @@ Used for an optional app-level lock. The lock is off by default. The usage strin
 Three optional Astera+ products, all reachable from Settings → Astera+:
 - Astera+ Monthly (product ID 000), auto-renewable subscription, 1 month, £0.49
 - Astera+ Yearly (product ID 001), auto-renewable subscription, 1 year, £4.99
-- Astera+ Lifetime (product ID 002), non-consumable, one-time, £15.00
+- Astera+ Lifetime (product ID 002), non-consumable, one-time, £14.99
 All three are submitted with this version. The full tracker (logging, prediction, history, calendar sync, HealthKit, export, delete, Face ID lock) is free without any purchase. Astera+ is purely a support tier that unlocks cosmetic and convenience features. There is no paywall on core functionality.
 
 7. SUBSCRIPTION DISCLOSURES (Guideline 3.1.2(c))

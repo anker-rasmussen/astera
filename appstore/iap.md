@@ -77,7 +77,7 @@ Astera+ is an optional support tier. The free version of Astera includes all cor
 | **Type** | Non-Consumable |
 | **Reference Name** _(private)_ | `Astera+ Lifetime` |
 | **Product ID** | `002` |
-| **Price** | $15.00 USD / £15.00 GBP / €15.00 EUR (region-customised, round-number tip-jar pricing) |
+| **Price** | $14.99 USD / £14.99 GBP / €14.99 EUR (region-customised) |
 
 **Localization: English (UK)**
 

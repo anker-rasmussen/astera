@@ -26,10 +26,10 @@ final class AsteraPlusDisclosureUITests: AsteraUITestCase {
 
     /// Asserts the row shows a real, formatted price rather than a placeholder or an empty string.
     ///
-    /// Deliberately a shape check, not an exact number. `AsteraPlus.storekit` says the lifetime
-    /// tier is `15.00`, and the simulator renders `$14.99`: StoreKit's local test framework snaps
-    /// `displayPrice` to a price point it recognises, and `$15.00` is not one. `0.49` and `4.99`
-    /// survive only because they happen to be canonical tier prices.
+    /// Deliberately a shape check, not an exact number. StoreKit's local test framework snaps
+    /// `displayPrice` to a price point it recognises, so the config's number and the rendered
+    /// number are not the same fact: setting the lifetime tier to a round `15.00` rendered as
+    /// `$14.99` regardless.
     ///
     /// So an exact assertion here would be testing Apple's price table, and it would test it
     /// against a local mock that has no connection to App Store Connect. What Astera is
