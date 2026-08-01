@@ -39,3 +39,6 @@ AsteraDev.xcodeproj/
 *.log
 /tmp/asteradev_*.png
 appstore/native_1320x2868/
+
+# Python bytecode from scripts/
+__pycache__/

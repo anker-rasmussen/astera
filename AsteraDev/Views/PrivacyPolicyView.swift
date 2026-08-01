@@ -51,9 +51,9 @@ struct PrivacyPolicyView: View {
 
     @ViewBuilder
     private func paragraphView(_ paragraph: String) -> some View {
-        let lines = paragraph.components(separatedBy: "\n")
-        if let first = lines.first, lines.count == 1, looksLikeHeading(first) {
-            Text(first)
+        // Headings are marked in the source Markdown, so there is nothing to infer.
+        if let heading = headingText(paragraph) {
+            Text(heading)
                 .font(.asteraSerif(20, weight: .medium))
                 .foregroundStyle(AsteraColor.ink)
                 .padding(.top, AsteraSpacing.sm)
@@ -66,9 +66,10 @@ struct PrivacyPolicyView: View {
         }
     }
 
-    private func looksLikeHeading(_ line: String) -> Bool {
-        // Short, no trailing punctuation: treat as a section heading.
-        let trimmed = line.trimmingCharacters(in: .whitespaces)
-        return trimmed.count < 50 && !trimmed.hasSuffix(".") && !trimmed.hasSuffix(",")
+    private func headingText(_ paragraph: String) -> String? {
+        for marker in ["## ", "# "] where paragraph.hasPrefix(marker) {
+            return String(paragraph.dropFirst(marker.count))
+        }
+        return nil
     }
 }
