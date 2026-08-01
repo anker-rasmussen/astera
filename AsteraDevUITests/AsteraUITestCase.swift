@@ -91,6 +91,83 @@ class AsteraUITestCase: XCTestCase {
         case ttc, postpartum, trackingOnT, notSure
     }
 
+    // MARK: - Reaching and tapping things reliably
+    //
+    // These live on the base class rather than on one suite because every screen worth testing is
+    // a scrolling list of controls, and each of the traps below cost an hour the first time. A
+    // suite that does not inherit them will rediscover them.
+
+    /// Scrolls until the element is wholly inside the viewport, above the tab bar.
+    ///
+    /// `scrollTo` stops as soon as `isHittable`, which is true when a sliver of a tall row shows,
+    /// and a tap then lands under the tab bar. Finishing the job with `swipeUp()` was worse: a
+    /// swipe moves most of a screen, so nudging a row nine points flung it four hundred points off
+    /// the top. Only a drag of a measured distance can move content by the amount actually needed.
+    func bringFullyOnScreen(_ element: XCUIElement, in app: XCUIApplication) {
+        let scrollView = app.scrollViews.firstMatch
+        scrollView.scrollTo(element)
+
+        let safeBottom = app.frame.height * 0.82
+        for _ in 0..<4 {
+            let overhang = element.frame.maxY - safeBottom
+            guard overhang > 1 else { return }
+            let start = scrollView.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.75))
+            start.press(forDuration: 0.05, thenDragTo: start.withOffset(CGVector(dx: 0, dy: -overhang - 8)))
+            waitForFrameToSettle(element)
+        }
+    }
+
+    /// Scrolls the element into view and taps it, failing if it could not be reached.
+    ///
+    /// `XCUIElement.tap()` on an off-screen element does not fail. It taps the element's frame
+    /// centre, wherever that happens to be, so a test that misses reports the app as broken.
+    func tapReliably(
+        _ element: XCUIElement,
+        _ what: String,
+        in app: XCUIApplication,
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) {
+        element.requireExistence(what, file: file, line: line)
+        bringFullyOnScreen(element, in: app)
+        XCTAssertTrue(element.isHittable, "\(what) exists but could not be scrolled into view", file: file, line: line)
+        element.tap()
+    }
+
+    /// Flips a toggle by tapping the switch, not the row.
+    ///
+    /// A SwiftUI `Toggle` publishes one accessibility element spanning the whole row, so the centre
+    /// `tap()` aims at is over the descriptive text and does nothing. The switch is a separate,
+    /// unlabelled element inside that row; finding it is indifferent to how tall the row wrapped.
+    func flip(_ toggle: XCUIElement, in app: XCUIApplication) {
+        bringFullyOnScreen(toggle, in: app)
+        waitForFrameToSettle(toggle)
+        switchControl(for: toggle, in: app).tap()
+    }
+
+    func switchControl(for row: XCUIElement, in app: XCUIApplication) -> XCUIElement {
+        let bounds = row.frame
+        let control = app.switches.allElementsBoundByIndex.first {
+            $0.identifier.isEmpty
+                && $0.frame.width < bounds.width
+                && $0.frame.midY >= bounds.minY
+                && $0.frame.midY <= bounds.maxY
+        }
+        return control ?? row
+    }
+
+    /// A coordinate tap resolves against the frame at the moment it is computed, and scrolling
+    /// decelerates, so a frame read mid-glide sends the tap somewhere else.
+    func waitForFrameToSettle(_ element: XCUIElement, attempts: Int = 10) {
+        var previous = element.frame
+        for _ in 0..<attempts {
+            Thread.sleep(forTimeInterval: 0.15)
+            let current = element.frame
+            if current == previous { return }
+            previous = current
+        }
+    }
+
     // MARK: - Birth years for the age gates
 
     /// `AgeMode` thresholds: gentle note under 9, sexual content hidden under 16, fertility

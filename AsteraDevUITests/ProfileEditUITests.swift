@@ -15,21 +15,21 @@ import XCTest
 /// subtitle does not break a test and nobody learns to avoid rewording.
 final class ProfileEditUITests: AsteraUITestCase {
 
+    // All three go through `tapReliably` on the base class rather than `.tap()`. The cycle mode
+    // picker is fourteen options deep inside a sheet, and on a short screen the later ones need
+    // real scrolling to reach. A tap that misses does not fail, it just does nothing, so the
+    // difference between these helpers and a bare tap is whether a failure is legible.
+
     private func openPicker(_ app: XCUIApplication, _ field: String) {
-        app.buttons["settings.profile.\(field)"]
-            .requireExistence("the \(field) row in Settings")
-            .tap()
+        tapReliably(app.buttons["settings.profile.\(field)"], "the \(field) row in Settings", in: app)
     }
 
     private func choose(_ app: XCUIApplication, _ rawValue: String) {
-        let row = app.buttons["choice.\(rawValue)"]
-            .requireExistence("the \(rawValue) option")
-        app.scrollViews.firstMatch.scrollTo(row)
-        row.tap()
+        tapReliably(app.buttons["choice.\(rawValue)"], "the \(rawValue) option", in: app)
     }
 
     private func save(_ app: XCUIApplication) {
-        app.buttons["profileEdit.save"].requireExistence("the Save button").tap()
+        tapReliably(app.buttons["profileEdit.save"], "the Save button", in: app)
     }
 
     /// Reads the value shown on a Settings row. The row's label is "label, value", so the value is
@@ -109,7 +109,7 @@ final class ProfileEditUITests: AsteraUITestCase {
 
         openPicker(app, "cycleMode")
         choose(app, "endometriosis")
-        app.buttons["profileEdit.cancel"].requireExistence("the Cancel button").tap()
+        tapReliably(app.buttons["profileEdit.cancel"], "the Cancel button", in: app)
 
         XCTAssertEqual(rowValue(app, "cycleMode"), before, "Cancel saved the change anyway")
     }
@@ -134,7 +134,7 @@ final class ProfileEditUITests: AsteraUITestCase {
         openPicker(app, "cycleMode")
 
         let ttc = app.buttons["choice.ttc"].requireExistence("trying to conceive, for an adult")
-        app.scrollViews.firstMatch.scrollTo(ttc)
+        bringFullyOnScreen(ttc, in: app)
         XCTAssertTrue(ttc.isHittable, "An adult should be able to select it, not just see it")
     }
 }
