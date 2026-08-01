@@ -68,20 +68,53 @@ class PermissionUITestCase: AsteraUITestCase {
     /// So: scroll until the row is properly inside the viewport, then aim at its right edge, where
     /// the switch actually is.
     func flip(_ toggle: XCUIElement, in app: XCUIApplication) {
-        let safeBottom = app.frame.height * 0.8
-        var swipes = 0
-        while toggle.frame.maxY > safeBottom && swipes < 8 {
-            app.scrollViews.firstMatch.swipeUp()
-            swipes += 1
-        }
+        bringFullyOnScreen(toggle, in: app)
         waitForFrameToSettle(toggle)
-        toggle.coordinate(withNormalizedOffset: CGVector(dx: 0.92, dy: 0.5)).tap()
+        switchControl(for: toggle, in: app).tap()
     }
 
-    /// A coordinate tap is resolved against the frame at the moment it is computed. Scrolling
-    /// decelerates, so on a loaded machine that frame can still be moving, and the tap then lands
-    /// above or below the switch and does nothing. Waiting for two identical readings costs a few
-    /// hundred milliseconds and removes the only source of flakiness this suite has shown.
+    /// The switch is a separate, unlabelled element inside the labelled row.
+    ///
+    /// Tapping the row does nothing, because the row's centre is over its descriptive text. Aiming
+    /// at the row's right edge works only while the row is where you last measured it. Finding the
+    /// actual control and tapping that is indifferent to how tall the row wrapped and how far it
+    /// scrolled, which is what makes it survive a screen size the test was not written on.
+    private func switchControl(for row: XCUIElement, in app: XCUIApplication) -> XCUIElement {
+        let bounds = row.frame
+        let control = app.switches.allElementsBoundByIndex.first {
+            $0.identifier.isEmpty
+                && $0.frame.width < bounds.width
+                && $0.frame.midY >= bounds.minY
+                && $0.frame.midY <= bounds.maxY
+        }
+        return control ?? row
+    }
+
+    /// Scrolls until the row is wholly inside the viewport, above the tab bar.
+    ///
+    /// `scrollTo` stops as soon as `isHittable`, which is true when a sliver of a tall row is
+    /// showing. Finishing the job with `swipeUp()` was the obvious next move and was wrong: a
+    /// swipe scrolls most of a screen, so nudging a row nine points upward flung it four hundred
+    /// points off the top, and the tap that followed landed on nothing. A drag of a measured
+    /// distance is the only gesture that can move the content by the amount actually needed.
+    private func bringFullyOnScreen(_ element: XCUIElement, in app: XCUIApplication) {
+        let scrollView = app.scrollViews.firstMatch
+        scrollView.scrollTo(element)
+
+        // Leave room for the tab bar, which overlays the bottom of the scroll view.
+        let safeBottom = app.frame.height * 0.82
+        for _ in 0..<4 {
+            let overhang = element.frame.maxY - safeBottom
+            guard overhang > 1 else { return }
+            let start = scrollView.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.75))
+            start.press(forDuration: 0.05, thenDragTo: start.withOffset(CGVector(dx: 0, dy: -overhang - 8)))
+            waitForFrameToSettle(element)
+        }
+    }
+
+    /// A coordinate tap is resolved against the frame at the moment it is computed, and scrolling
+    /// decelerates, so a frame read mid-glide sends the tap somewhere else. Two identical readings
+    /// cost a few hundred milliseconds.
     private func waitForFrameToSettle(_ element: XCUIElement, attempts: Int = 10) {
         var previous = element.frame
         for _ in 0..<attempts {

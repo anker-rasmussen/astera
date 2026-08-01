@@ -39,20 +39,32 @@ jobs:
       - name: Generate the project
         run: xcodegen generate
 
-      # Runner images change their simulator lineup between Xcode releases, so pick whatever
-      # iPhone is actually installed rather than hardcoding a model that may vanish.
+      # Runner images change their simulator lineup between Xcode releases, so discover what is
+      # installed rather than hardcoding a model that may vanish.
+      #
+      # Prefer the smallest screen available, deliberately. This job happened to land on an
+      # iPhone SE by accident and immediately failed two tests that pass on a large phone: a
+      # Settings row that is comfortably in view on a 6.9" screen sits under the tab bar on a
+      # 4.7" one. The tightest layout is the one worth running unattended, so the choice is now
+      # made on purpose instead of by list order.
       - name: Pick a simulator
         id: sim
         run: |
           DEVICE=$(xcrun simctl list devices available --json | python3 -c '
           import json, sys
           data = json.load(sys.stdin)["devices"]
-          runtimes = sorted(r for r in data if "iOS" in r)
-          for runtime in reversed(runtimes):
-              phones = [d for d in data[runtime] if d["name"].startswith("iPhone")]
-              if phones:
-                  print(phones[-1]["name"])
-                  break
+          phones = [d["name"] for runtime in data if "iOS" in runtime
+                    for d in data[runtime] if d["name"].startswith("iPhone")]
+          if not phones:
+              sys.exit("No iPhone simulators on this runner")
+          # Smallest first: SE, then the non-Plus/Max/Pro models, then whatever is left.
+          def size(name):
+              if "SE" in name: return 0
+              if "mini" in name: return 1
+              if "Max" in name or "Plus" in name: return 4
+              if "Pro" in name: return 3
+              return 2
+          print(sorted(set(phones), key=lambda n: (size(n), n))[0])
           ')
           echo "Using simulator: $DEVICE"
           echo "device=$DEVICE" >> "$GITHUB_OUTPUT"

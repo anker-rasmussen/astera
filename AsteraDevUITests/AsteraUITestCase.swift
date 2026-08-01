@@ -138,12 +138,25 @@ extension XCUIElement {
         )
     }
 
-    /// Scrolls the receiver (a scroll view) until `element` is on screen, or gives up.
-    func scrollTo(_ element: XCUIElement, maxSwipes: Int = 12) {
+    /// Scrolls the receiver (a scroll view) until `element` is on screen, or until the content
+    /// stops moving.
+    ///
+    /// The swipe cap used to be 12, which was enough for Settings on the simulator this was
+    /// written against and not enough for the notification toggles on the shorter one CI picks.
+    /// A cap tuned to one screen size is a test that passes on one machine, so the real exit
+    /// condition is the content no longer moving; the cap is only a backstop against a view that
+    /// scrolls forever.
+    func scrollTo(_ element: XCUIElement, maxSwipes: Int = 30) {
         var swipes = 0
+        var lastFrame = element.frame
         while !element.isHittable && swipes < maxSwipes {
             swipeUp()
             swipes += 1
+            let reached = element.frame
+            // `frame` is zero until the element enters the accessibility tree, so only trust a
+            // repeat reading once it has a real one.
+            if reached == lastFrame && reached != .zero { break }
+            lastFrame = reached
         }
     }
 }
