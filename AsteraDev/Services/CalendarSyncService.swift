@@ -15,6 +15,9 @@ enum CalendarSyncService {
     }
 
     static var currentAuthorization: AuthorizationState {
+        #if DEBUG
+        if let stub = DebugPermissions.calendar { return stub }
+        #endif
         switch EKEventStore.authorizationStatus(for: .event) {
         case .notDetermined: return .notRequested
         case .denied: return .denied
@@ -29,6 +32,11 @@ enum CalendarSyncService {
     /// Asks for Calendar access. Returns the resulting authorization state.
     @discardableResult
     static func requestAccess() async -> AuthorizationState {
+        #if DEBUG
+        // Before touching EKEventStore: asking it would put the real system dialog on screen,
+        // which no test can dismiss.
+        if let stub = DebugPermissions.calendar { return stub }
+        #endif
         let store = EKEventStore()
         do {
             if #available(iOS 17.0, *) {

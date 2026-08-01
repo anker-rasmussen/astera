@@ -5,7 +5,10 @@ enum HealthKitService {
     private static let store = HKHealthStore()
 
     static var isAvailable: Bool {
-        HKHealthStore.isHealthDataAvailable()
+        #if DEBUG
+        if let stub = DebugPermissions.health { return stub != .unavailable }
+        #endif
+        return HKHealthStore.isHealthDataAvailable()
     }
 
     static var menstrualFlowType: HKCategoryType {
@@ -21,6 +24,9 @@ enum HealthKitService {
     /// Returns true if we have *any* permission (Apple won't tell us read-only status by design).
     @discardableResult
     static func requestAccess() async -> Bool {
+        #if DEBUG
+        if let stub = DebugPermissions.health { return stub == .granted }
+        #endif
         guard isAvailable else { return false }
         do {
             try await store.requestAuthorization(

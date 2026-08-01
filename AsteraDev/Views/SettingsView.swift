@@ -246,6 +246,7 @@ struct SettingsView: View {
                     }
                     .buttonStyle(.plain)
                     .disabled(importPending)
+                    .accessibilityIdentifier("settings.health.import")
 
                     if let result = importResult {
                         importResultView(result)
@@ -254,6 +255,7 @@ struct SettingsView: View {
                             .font(.asteraSerifItalic(13))
                             .foregroundStyle(AsteraColor.accent)
                             .fixedSize(horizontal: false, vertical: true)
+                            .accessibilityIdentifier("settings.health.importDenied")
                     }
                 }
             }
@@ -317,12 +319,8 @@ struct SettingsView: View {
             do {
                 let result = try await HealthKitImportService.runImport(defaultMode: mode, context: modelContext)
                 importPending = false
+                // An empty result now means Apple Health is genuinely empty. A refusal throws.
                 importResult = result
-                if !result.didFindAnything && result.samplesFound == 0 {
-                    // Could be either no access or genuinely no data; we can't tell the difference
-                    // without an explicit auth check, so prefer the gentler "nothing here yet" message
-                    // unless the user re-taps and it still fails.
-                }
             } catch {
                 importPending = false
                 importFailed = true
@@ -427,12 +425,14 @@ struct SettingsView: View {
                 }
                 .tint(AsteraColor.accent)
                 .disabled(calendarPending)
+                .accessibilityIdentifier("settings.calendar.toggle")
 
                 if calendarFailed {
                     Text("Calendar access wasn't given. Open the Settings app → Astera → Calendars to allow it.")
                         .font(.asteraSerifItalic(13))
                         .foregroundStyle(AsteraColor.accent)
                         .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityIdentifier("settings.calendar.denied")
                 }
             }
         }
@@ -511,12 +511,14 @@ struct SettingsView: View {
                 }
                 .tint(AsteraColor.accent)
                 .disabled(healthPending || !HealthKitService.isAvailable)
+                .accessibilityIdentifier("settings.health.toggle")
 
                 if healthFailed {
                     Text("Apple Health access wasn't given. Open the Health app → Sharing → Apps and Services → Astera to allow it.")
                         .font(.asteraSerifItalic(13))
                         .foregroundStyle(AsteraColor.accent)
                         .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityIdentifier("settings.health.denied")
                 }
             }
         }
@@ -590,9 +592,17 @@ struct SettingsView: View {
                     .lineSpacing(2)
                     .fixedSize(horizontal: false, vertical: true)
 
-                notificationCategoryRow(category: .periodInThreeDays, binding: notify3DaysBinding)
+                notificationCategoryRow(
+                    category: .periodInThreeDays,
+                    binding: notify3DaysBinding,
+                    identifier: "settings.notifications.threeDays"
+                )
                 Hairline()
-                notificationCategoryRow(category: .periodToday, binding: notifyTodayBinding)
+                notificationCategoryRow(
+                    category: .periodToday,
+                    binding: notifyTodayBinding,
+                    identifier: "settings.notifications.today"
+                )
 
                 if notificationsDenied {
                     Text("System notifications are turned off for Astera. Open the Settings app → Astera → Notifications to allow them.")
@@ -600,12 +610,17 @@ struct SettingsView: View {
                         .foregroundStyle(AsteraColor.accent)
                         .padding(.top, AsteraSpacing.sm)
                         .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityIdentifier("settings.notifications.denied")
                 }
             }
         }
     }
 
-    private func notificationCategoryRow(category: NotificationCategory, binding: Binding<Bool>) -> some View {
+    private func notificationCategoryRow(
+        category: NotificationCategory,
+        binding: Binding<Bool>,
+        identifier: String
+    ) -> some View {
         VStack(alignment: .leading, spacing: AsteraSpacing.sm) {
             Toggle(isOn: binding) {
                 VStack(alignment: .leading, spacing: 4) {
@@ -621,6 +636,7 @@ struct SettingsView: View {
             }
             .tint(AsteraColor.accent)
             .disabled(notificationsPending)
+            .accessibilityIdentifier(identifier)
 
             HStack(alignment: .top, spacing: AsteraSpacing.sm) {
                 Circle().fill(AsteraColor.accent.opacity(0.4)).frame(width: 6, height: 6)

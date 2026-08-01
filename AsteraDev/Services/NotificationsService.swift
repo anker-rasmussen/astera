@@ -35,6 +35,9 @@ enum NotificationsService {
     /// Asks for notification permission. Returns the resulting authorization state.
     @discardableResult
     static func requestAuthorization() async -> UNAuthorizationStatus {
+        #if DEBUG
+        if let stub = DebugPermissions.notifications { return stub }
+        #endif
         do {
             try await notificationCenter.requestAuthorization(options: [.alert, .sound, .badge])
         } catch {
@@ -45,7 +48,10 @@ enum NotificationsService {
     }
 
     static func currentAuthorization() async -> UNAuthorizationStatus {
-        await notificationCenter.notificationSettings().authorizationStatus
+        #if DEBUG
+        if let stub = DebugPermissions.notifications { return stub }
+        #endif
+        return await notificationCenter.notificationSettings().authorizationStatus
     }
 
     /// Reschedules notifications for the active categories.

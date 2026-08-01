@@ -22,13 +22,18 @@ class AsteraUITestCase: XCTestCase {
     ///   - mode: any `CycleMode` raw value, e.g. `"perimenopause"`.
     ///   - birthYear: drives the age gates. Omit for an adult.
     ///   - cycles: number of seeded past cycles. `0` gives the empty first-run state.
+    ///   - calendar, health, notifications: stub the system's answer for that permission. Omit to
+    ///     use the real system, which on a simulator means the dialog nobody can tap.
     @discardableResult
     func launchApp(
         tab: Tab = .today,
         mode: Mode = .regular,
         birthYear: Int? = nil,
         cycles: Int? = nil,
-        openSheet: Sheet? = nil
+        openSheet: Sheet? = nil,
+        calendar: CalendarPermission? = nil,
+        health: HealthPermission? = nil,
+        notifications: NotificationPermission? = nil
     ) -> XCUIApplication {
         let app = XCUIApplication()
         app.launchEnvironment["ASTERA_FORCE_HOME"] = "1"
@@ -37,8 +42,29 @@ class AsteraUITestCase: XCTestCase {
         if let birthYear { app.launchEnvironment["ASTERA_SEED_BIRTH_YEAR"] = String(birthYear) }
         if let cycles { app.launchEnvironment["ASTERA_SEED_CYCLES"] = String(cycles) }
         if let openSheet { app.launchEnvironment["ASTERA_OPEN_SHEET"] = openSheet.rawValue }
+        if let calendar { app.launchEnvironment["ASTERA_PERMISSION_CALENDAR"] = calendar.rawValue }
+        if let health { app.launchEnvironment["ASTERA_PERMISSION_HEALTH"] = health.rawValue }
+        if let notifications { app.launchEnvironment["ASTERA_PERMISSION_NOTIFICATIONS"] = notifications.rawValue }
         app.launch()
         return app
+    }
+
+    // MARK: - Permission stubs
+    //
+    // These mirror `DebugPermissions` in the app. A raw value the app does not understand trips
+    // an assertion there rather than falling back to the real system, so a typo in a test cannot
+    // quietly turn into a test that passes for the wrong reason.
+
+    enum CalendarPermission: String {
+        case granted, writeOnly, denied, restricted, notRequested
+    }
+
+    enum HealthPermission: String {
+        case granted, denied, unavailable
+    }
+
+    enum NotificationPermission: String {
+        case authorized, provisional, denied, notDetermined
     }
 
     /// Launches with no seeding at all, at the first onboarding step.

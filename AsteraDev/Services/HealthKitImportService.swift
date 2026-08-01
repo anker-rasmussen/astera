@@ -16,14 +16,21 @@ enum HealthKitImportService {
         var didFindAnything: Bool { samplesFound > 0 }
     }
 
+    enum ImportError: Error {
+        /// The user said no to Apple Health, which is not the same as Apple Health being empty.
+        case accessNotGranted
+    }
+
     /// Asks for HealthKit read access (if not already granted) and replays every menstrual
     /// flow sample we don't already have on file. Idempotent: re-running won't duplicate days.
+    ///
+    /// A refusal throws rather than returning an empty result. Returning empty made the caller
+    /// tell the user "Apple Health doesn't have any menstrual flow yet", which is both untrue
+    /// and a dead end: the advice is to go and add data, when what they need is to grant access.
     @MainActor
     static func runImport(defaultMode: CycleMode, context: ModelContext) async throws -> Result {
         let granted = await HealthKitService.requestAccess()
-        guard granted else {
-            return Result(samplesFound: 0, daysImported: 0, cyclesAdded: 0, sourceNames: [])
-        }
+        guard granted else { throw ImportError.accessNotGranted }
         let samples = try await HealthKitService.fetchMenstrualHistory()
         return try applySamples(samples, defaultMode: defaultMode, context: context)
     }
