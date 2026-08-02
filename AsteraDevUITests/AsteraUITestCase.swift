@@ -11,9 +11,18 @@ class AsteraUITestCase: XCTestCase {
     /// Generous but bounded. Anything slower than this on a warm simulator is a real problem.
     static let timeout: TimeInterval = 20
 
+    /// The app under test, set by `launchApp`. Held here so the helpers below can reach the scroll
+    /// view and the screen bounds without every call site passing them back in.
+    private(set) var app: XCUIApplication!
+
     override func setUp() {
         super.setUp()
         continueAfterFailure = false
+    }
+
+    override func tearDown() {
+        app = nil
+        super.tearDown()
     }
 
     /// Launches past onboarding in the state the test needs.
@@ -46,6 +55,7 @@ class AsteraUITestCase: XCTestCase {
         if let health { app.launchEnvironment["ASTERA_PERMISSION_HEALTH"] = health.rawValue }
         if let notifications { app.launchEnvironment["ASTERA_PERMISSION_NOTIFICATIONS"] = notifications.rawValue }
         app.launch()
+        self.app = app
         return app
     }
 
@@ -72,6 +82,7 @@ class AsteraUITestCase: XCTestCase {
     func launchFreshInstall() -> XCUIApplication {
         let app = XCUIApplication()
         app.launch()
+        self.app = app
         return app
     }
 
@@ -93,79 +104,202 @@ class AsteraUITestCase: XCTestCase {
 
     // MARK: - Reaching and tapping things reliably
     //
-    // These live on the base class rather than on one suite because every screen worth testing is
-    // a scrolling list of controls, and each of the traps below cost an hour the first time. A
-    // suite that does not inherit them will rediscover them.
-
-    /// Scrolls until the element is wholly inside the viewport, above the tab bar.
-    ///
-    /// `scrollTo` stops as soon as `isHittable`, which is true when a sliver of a tall row shows,
-    /// and a tap then lands under the tab bar. Finishing the job with `swipeUp()` was worse: a
-    /// swipe moves most of a screen, so nudging a row nine points flung it four hundred points off
-    /// the top. Only a drag of a measured distance can move content by the amount actually needed.
-    func bringFullyOnScreen(_ element: XCUIElement, in app: XCUIApplication) {
-        let scrollView = app.scrollViews.firstMatch
-        scrollView.scrollTo(element)
-
-        let safeBottom = app.frame.height * 0.82
-        for _ in 0..<4 {
-            let overhang = element.frame.maxY - safeBottom
-            guard overhang > 1 else { return }
-            let start = scrollView.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.75))
-            start.press(forDuration: 0.05, thenDragTo: start.withOffset(CGVector(dx: 0, dy: -overhang - 8)))
-            waitForFrameToSettle(element)
-        }
-    }
+    // Every screen worth testing is a scrolling list of controls, and each trap below cost real
+    // time the first time it was hit. They live on the base class so no suite has to rediscover
+    // them, and they all forward `file` and `line` so a failure points at the test rather than
+    // at the helper.
 
     /// Scrolls the element into view and taps it, failing if it could not be reached.
     ///
-    /// `XCUIElement.tap()` on an off-screen element does not fail. It taps the element's frame
-    /// centre, wherever that happens to be, so a test that misses reports the app as broken.
-    func tapReliably(
+    /// The reachability check is the point. `XCUIElement.tap()` on an off-screen element does not
+    /// fail: it taps that element's frame centre, wherever that lands. A test that misses reports
+    /// the app as broken, which is how two of these cost an afternoon.
+    func tap(
         _ element: XCUIElement,
         _ what: String,
-        in app: XCUIApplication,
         file: StaticString = #filePath,
         line: UInt = #line
     ) {
         element.requireExistence(what, file: file, line: line)
-        bringFullyOnScreen(element, in: app)
-        XCTAssertTrue(element.isHittable, "\(what) exists but could not be scrolled into view", file: file, line: line)
+        scrollIntoView(element)
+        XCTAssertTrue(
+            element.isHittable,
+            "Expected \(what) to be reachable, but it could not be scrolled into view",
+            file: file,
+            line: line
+        )
         element.tap()
     }
 
     /// Flips a toggle by tapping the switch, not the row.
     ///
     /// A SwiftUI `Toggle` publishes one accessibility element spanning the whole row, so the centre
-    /// `tap()` aims at is over the descriptive text and does nothing. The switch is a separate,
-    /// unlabelled element inside that row; finding it is indifferent to how tall the row wrapped.
-    func flip(_ toggle: XCUIElement, in app: XCUIApplication) {
-        bringFullyOnScreen(toggle, in: app)
-        waitForFrameToSettle(toggle)
-        switchControl(for: toggle, in: app).tap()
+    /// that `tap()` aims at is over the descriptive text and nothing happens. The switch is a
+    /// separate, unlabelled element inside that row, and finding it is indifferent to how tall the
+    /// row wrapped or how far it scrolled.
+    func flip(
+        _ toggle: XCUIElement,
+        _ what: String = "the toggle",
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) {
+        toggle.requireExistence(what, file: file, line: line)
+        scrollIntoView(toggle)
+        XCTAssertTrue(
+            toggle.isHittable,
+            "Expected \(what) to be reachable, but it could not be scrolled into view",
+            file: file,
+            line: line
+        )
+        switchControl(within: toggle).tap()
     }
 
-    func switchControl(for row: XCUIElement, in app: XCUIApplication) -> XCUIElement {
+    /// Scrolls until the element is somewhere it can actually be tapped.
+    ///
+    /// Two passes. Coarse swipes get it on screen, in whichever direction it lies, because a test
+    /// that scrolls down to a toggle and then reaches back up for a row near the top is ordinary.
+    /// Then measured nudges put it clear of the status bar and the tab bar.
+    ///
+    /// The second pass is the one that matters, and only a short screen shows why. `isHittable`
+    /// is true when any part of the element is on screen, including a part something else is
+    /// drawing over. A swipe travels slightly more than a screen height, so on a 375x667 phone a
+    /// 58pt row goes from `minY = 662`, a sliver above the tab bar, to `minY = -18`, a sliver
+    /// under the status bar. Both report hittable; a tap at either lands on furniture. There is no
+    /// swipe count that fixes that, which is why the sweep only has to get the element into the
+    /// scroll view's neighbourhood and `settle` does the rest.
+    ///
+    /// Deliberately query-light. An earlier version polled `element.frame` in a settle loop inside
+    /// a retry loop, and each of those reads is an accessibility query against the whole tree. It
+    /// turned a twenty-second test into four minutes without ever failing, which is its own kind
+    /// of broken. One `frame` read per swipe is affordable; ten per swipe is not.
+    func scrollIntoView(_ element: XCUIElement) {
+        let scrollView = app.scrollViews.firstMatch
+        guard scrollView.exists else { return }
+
+        if !element.isHittable {
+            // Guess the direction, then correct it. A zero frame usually means the element is
+            // further down and the accessibility tree has not realised it, but a row that
+            // scrolled off the top gets derealised too and reads the same. Guessing wrong and
+            // never recovering is how a test spends thirty swipes travelling away from its
+            // target, so an exhausted sweep turns around and tries the other way.
+            let frame = element.frame
+            let liesBelow = frame == .zero || frame.minY >= 0
+            if !sweep(scrollView, toward: element, down: liesBelow) {
+                sweep(scrollView, toward: element, down: !liesBelow)
+            }
+        }
+
+        settle(scrollView, so: element)
+    }
+
+    /// Swipes one way until the element is reachable or the content stops moving.
+    ///
+    /// The exit condition is the content, not a swipe count. A cap tuned to one screen is a test
+    /// that passes on one machine: the same twelve swipes that clear Settings on a 17 Pro fall
+    /// short of the notification toggles on the 375x667 screen CI picks. `limit` is only a
+    /// backstop against a view that scrolls forever.
+    @discardableResult
+    private func sweep(
+        _ scrollView: XCUIElement,
+        toward element: XCUIElement,
+        down: Bool,
+        limit: Int = 30
+    ) -> Bool {
+        var lastFrame = element.frame
+        for _ in 0..<limit {
+            if element.isHittable { return true }
+            down ? scrollView.swipeUp() : scrollView.swipeDown()
+            let frame = element.frame
+            // `frame` is zero until the element enters the accessibility tree, so a repeat
+            // reading only means the content stopped once there is a real one to repeat.
+            if frame == lastFrame && frame != .zero { break }
+            lastFrame = frame
+        }
+        return element.isHittable
+    }
+
+    /// Nudges the content until the element sits clear of the status bar and the tab bar.
+    ///
+    /// Correcting in one direction only is not enough: the sweep can leave the element off either
+    /// edge. A row taller than the gap between them gets its top aligned and nothing more, since
+    /// there is nowhere to put it that clears both.
+    ///
+    /// The bounds are the furniture, not a fraction of the screen, and the difference is not
+    /// cosmetic. An earlier version reserved the top 14%, which no phone's status bar occupies,
+    /// so it decided perfectly visible rows in a sheet needed pushing down. Dragging down inside
+    /// a sheet whose list is already at the top is the dismiss gesture, and two picker tests
+    /// started saving the value they opened with.
+    private func settle(_ scrollView: XCUIElement, so element: XCUIElement) {
+        let top = app.frame.height * 0.09
+        let tabBar = app.tabBars.firstMatch
+        let tabBarTop = tabBar.exists ? tabBar.frame.minY : 0
+        let bottom = tabBarTop > 0 ? tabBarTop : app.frame.height * 0.92
+
+        for _ in 0..<3 {
+            let frame = element.frame
+            guard frame != .zero else { return }
+
+            let tallerThanTheGap = frame.height > bottom - top
+            let travel: CGFloat
+            if frame.minY < top || (frame.maxY > bottom && tallerThanTheGap) {
+                travel = top - frame.minY + 8
+            } else if frame.maxY > bottom {
+                travel = -(frame.maxY - bottom + 8)
+            } else {
+                return
+            }
+
+            // Below a scroll view's own pan slop the drag moves nothing, so asking for it costs
+            // a press, a hold and an idle wait to end up exactly where we started.
+            guard abs(travel) > 12 else { return }
+            nudge(scrollView, by: travel)
+
+            // Content at its end cannot give any more; further nudges would only rubber-band it.
+            if element.frame == frame { return }
+        }
+    }
+
+    /// Drags the content by a measured distance, with no momentum.
+    ///
+    /// A swipe would move most of a screen and overshoot. So would a flick: dragging after a
+    /// 0.05s press is read as one, and the scroll view keeps travelling after the finger lifts,
+    /// which is how a 267pt correction ended up throwing the row off the top instead. Pressing
+    /// first, moving slowly, and holding at the end makes the distance asked for the distance
+    /// travelled.
+    private func nudge(_ scrollView: XCUIElement, by travel: CGFloat) {
+        let height = app.frame.height
+        let clamped = max(-height * 0.5, min(height * 0.5, travel))
+        // Start from the half of the screen the drag is heading away from, so both ends stay
+        // well inside the scroll view.
+        let start = scrollView.coordinate(
+            withNormalizedOffset: CGVector(dx: 0.5, dy: clamped < 0 ? 0.7 : 0.3)
+        )
+        start.press(
+            forDuration: 0.3,
+            thenDragTo: start.withOffset(CGVector(dx: 0, dy: clamped)),
+            withVelocity: .slow,
+            thenHoldForDuration: 0.1
+        )
+    }
+
+    /// The bare switch inside a labelled toggle row, or the row itself if there isn't one.
+    ///
+    /// Picks the nearest by centre rather than the first that overlaps. Settings stacks toggles
+    /// directly on top of each other, and a row tall enough to wrap its explainer can span a
+    /// neighbour's switch as well as its own. Taking the first overlap would then flip the wrong
+    /// setting, and the test would fail describing the right one.
+    func switchControl(within row: XCUIElement) -> XCUIElement {
         let bounds = row.frame
-        let control = app.switches.allElementsBoundByIndex.first {
+        let candidates = app.switches.allElementsBoundByIndex.filter {
             $0.identifier.isEmpty
                 && $0.frame.width < bounds.width
                 && $0.frame.midY >= bounds.minY
                 && $0.frame.midY <= bounds.maxY
         }
-        return control ?? row
-    }
-
-    /// A coordinate tap resolves against the frame at the moment it is computed, and scrolling
-    /// decelerates, so a frame read mid-glide sends the tap somewhere else.
-    func waitForFrameToSettle(_ element: XCUIElement, attempts: Int = 10) {
-        var previous = element.frame
-        for _ in 0..<attempts {
-            Thread.sleep(forTimeInterval: 0.15)
-            let current = element.frame
-            if current == previous { return }
-            previous = current
+        let nearest = candidates.min {
+            abs($0.frame.midY - bounds.midY) < abs($1.frame.midY - bounds.midY)
         }
+        return nearest ?? row
     }
 
     // MARK: - Birth years for the age gates
@@ -182,6 +316,12 @@ class AsteraUITestCase: XCTestCase {
 }
 
 extension XCUIElement {
+    /// A switch's state, which XCUITest reports as the string "0" or "1" in `value`.
+    ///
+    /// Worth a name: `XCTAssertFalse(toggle.isOn)` says what the test means, where
+    /// `XCTAssertEqual(toggle.value as? String, "0")` says how the framework happens to spell it.
+    var isOn: Bool { (value as? String) == "1" }
+
     /// Waits for the element and fails the test with a useful message if it never appears.
     @discardableResult
     func requireExistence(
@@ -213,27 +353,5 @@ extension XCUIElement {
             file: file,
             line: line
         )
-    }
-
-    /// Scrolls the receiver (a scroll view) until `element` is on screen, or until the content
-    /// stops moving.
-    ///
-    /// The swipe cap used to be 12, which was enough for Settings on the simulator this was
-    /// written against and not enough for the notification toggles on the shorter one CI picks.
-    /// A cap tuned to one screen size is a test that passes on one machine, so the real exit
-    /// condition is the content no longer moving; the cap is only a backstop against a view that
-    /// scrolls forever.
-    func scrollTo(_ element: XCUIElement, maxSwipes: Int = 30) {
-        var swipes = 0
-        var lastFrame = element.frame
-        while !element.isHittable && swipes < maxSwipes {
-            swipeUp()
-            swipes += 1
-            let reached = element.frame
-            // `frame` is zero until the element enters the accessibility tree, so only trust a
-            // repeat reading once it has a real one.
-            if reached == lastFrame && reached != .zero { break }
-            lastFrame = reached
-        }
     }
 }

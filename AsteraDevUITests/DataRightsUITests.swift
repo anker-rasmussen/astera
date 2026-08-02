@@ -10,11 +10,9 @@ final class DataRightsUITests: AsteraUITestCase {
     // MARK: - Right to data portability
 
     func testExportProducesAShareableFile() {
-        let app = launchApp(tab: .settings, cycles: 3)
+        launchApp(tab: .settings, cycles: 3)
 
-        app.buttons["settings.data.export"]
-            .requireExistence("the export row")
-            .tap()
+        tap(app.buttons["settings.data.export"], "the export row")
 
         // The export sheet only presents once the PDF has been built and written to disk, so
         // its appearance is the proof the file exists.
@@ -28,8 +26,8 @@ final class DataRightsUITests: AsteraUITestCase {
     /// policy calls the PDF the user's right to data portability; this screen used to call the
     /// same file "a plain-text JSON".
     func testExportScreenDescribesThePdfTheUserActuallyGets() {
-        let app = launchApp(tab: .settings, cycles: 3)
-        app.buttons["settings.data.export"].requireExistence("the export row").tap()
+        launchApp(tab: .settings, cycles: 3)
+        tap(app.buttons["settings.data.export"], "the export row")
         app.staticTexts["YOUR EXPORT · READY"].requireExistence("the export sheet")
 
         let copy = app.staticTexts.allElementsBoundByIndex.map(\.label).joined(separator: " ")
@@ -40,9 +38,9 @@ final class DataRightsUITests: AsteraUITestCase {
     /// Export must not require any data. A user who deletes everything and then exports should
     /// get an empty document, not a hang or a crash.
     func testExportWorksWithNothingLogged() {
-        let app = launchApp(tab: .settings, cycles: 0)
+        launchApp(tab: .settings, cycles: 0)
 
-        app.buttons["settings.data.export"].requireExistence("the export row").tap()
+        tap(app.buttons["settings.data.export"], "the export row")
 
         app.staticTexts["YOUR EXPORT · READY"]
             .requireExistence("the export sheet, even with nothing logged")
@@ -53,9 +51,9 @@ final class DataRightsUITests: AsteraUITestCase {
 
     /// Destructive and irreversible, so it must be confirmed rather than fired by one tap.
     func testDeleteAsksBeforeItErases() {
-        let app = launchApp(tab: .settings, cycles: 3)
+        launchApp(tab: .settings, cycles: 3)
 
-        app.buttons["settings.data.delete"].requireExistence("the delete row").tap()
+        tap(app.buttons["settings.data.delete"], "the delete row")
 
         app.buttons["Yes, delete everything"]
             .requireExistence("the destructive confirmation")
@@ -78,7 +76,7 @@ final class DataRightsUITests: AsteraUITestCase {
     /// erasure returns the app to its first-run state. That is the observable proof the settings
     /// went too, not just the cycles.
     func testDeleteEverythingReturnsTheAppToFirstRun() {
-        let app = launchApp(tab: .settings, cycles: 3)
+        launchApp(tab: .settings, cycles: 3)
 
         // Confirm there is something to lose first, or the assertion afterwards proves nothing.
         app.tabBars.buttons["Today"].tap()
@@ -86,7 +84,7 @@ final class DataRightsUITests: AsteraUITestCase {
             .requireAbsence("the empty state before deleting")
 
         app.tabBars.buttons["Settings"].tap()
-        app.buttons["settings.data.delete"].requireExistence("the delete row").tap()
+        tap(app.buttons["settings.data.delete"], "the delete row")
         app.buttons["Yes, delete everything"]
             .requireExistence("the destructive confirmation")
             .tap()
@@ -98,9 +96,9 @@ final class DataRightsUITests: AsteraUITestCase {
     /// Erasure has to outlive the process: clearing a view is not clearing a store. Relaunching
     /// without the seed hook means anything on screen came from disk.
     func testDeletedDataDoesNotComeBackOnRelaunch() {
-        let app = launchApp(tab: .settings, cycles: 3)
+        launchApp(tab: .settings, cycles: 3)
 
-        app.buttons["settings.data.delete"].requireExistence("the delete row").tap()
+        tap(app.buttons["settings.data.delete"], "the delete row")
         app.buttons["Yes, delete everything"]
             .requireExistence("the destructive confirmation")
             .tap()

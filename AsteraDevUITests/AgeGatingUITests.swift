@@ -12,18 +12,18 @@ final class AgeGatingUITests: AsteraUITestCase {
     // MARK: - The under-16 gate on sexual activity
 
     func testUnderSixteensCannotSeeTheSexualActivityToggle() {
-        let app = launchApp(tab: .settings, birthYear: Age.underSexualThreshold)
+        launchApp(tab: .settings, birthYear: Age.underSexualThreshold)
         app.staticTexts["WHAT YOU LOG"].requireExistence("the logging preferences section")
         app.switches[sexualToggle].requireAbsence("the sexual activity toggle, for an under-16")
     }
 
     func testSixteenAndOverCanSeeTheSexualActivityToggle() {
-        let app = launchApp(tab: .settings, birthYear: Age.teenAboveSexualThreshold)
+        launchApp(tab: .settings, birthYear: Age.teenAboveSexualThreshold)
         app.switches[sexualToggle].requireExistence("the sexual activity toggle, for a 17 year old")
     }
 
     func testAdultsCanSeeTheSexualActivityToggle() {
-        let app = launchApp(tab: .settings, birthYear: Age.adult)
+        launchApp(tab: .settings, birthYear: Age.adult)
         app.switches[sexualToggle].requireExistence("the sexual activity toggle, for an adult")
     }
 
@@ -35,7 +35,7 @@ final class AgeGatingUITests: AsteraUITestCase {
     /// which is off by default, so that has to be turned on or their absence proves nothing about
     /// age. Only "painful sex" sits in the always-visible symptoms list.
     func testSexualActivityChipsAreHiddenFromUnderSixteensInTheLogSheet() {
-        let app = launchApp(tab: .settings, birthYear: Age.underSexualThreshold)
+        launchApp(tab: .settings, birthYear: Age.underSexualThreshold)
         enable(app, "settings.log.lifestyle")
         openLogSheetFromSettings(app)
 
@@ -51,7 +51,7 @@ final class AgeGatingUITests: AsteraUITestCase {
     /// The same three chips, for an adult who opted in. Without this, the test above would pass
     /// even if the chips had been deleted from the app entirely.
     func testAdultsWhoOptInDoSeeTheSexualActivityChips() {
-        let app = launchApp(tab: .settings, birthYear: Age.adult)
+        launchApp(tab: .settings, birthYear: Age.adult)
         enable(app, "settings.log.lifestyle")
         enable(app, sexualToggle)
         openLogSheetFromSettings(app)
@@ -71,30 +71,25 @@ final class AgeGatingUITests: AsteraUITestCase {
     /// adult who enables sexual-activity logging and then sets a birth year making them 15 should
     /// lose it, and it must not come back when they set the year forward again.
     func testTurningBackTheBirthYearRevokesSexualActivityConsent() {
-        let app = launchApp(tab: .settings, birthYear: Age.adult)
+        launchApp(tab: .settings, birthYear: Age.adult)
 
         let toggle = app.switches[sexualToggle].requireExistence("the sexual activity toggle")
-        toggle.tap()
-        XCTAssertEqual(toggle.value as? String, "1", "Toggle should be on after tapping it")
+        flip(toggle, "the sexual activity toggle")
+        XCTAssertTrue(toggle.isOn, "The sexual activity toggle should be on after flipping it")
 
-        setBirthYear(app, to: Age.underSexualThreshold)
+        setBirthYear(to: Age.underSexualThreshold)
         app.switches[sexualToggle].requireAbsence("the toggle, now that the user reads as 15")
 
         // Back to an adult year. The control returns; the consent must not.
-        setBirthYear(app, to: Age.adult)
+        setBirthYear(to: Age.adult)
         let restored = app.switches[sexualToggle].requireExistence("the toggle, for an adult again")
-        XCTAssertEqual(
-            restored.value as? String, "0",
-            "Consent must not survive the trip below the age gate"
-        )
+        XCTAssertFalse(restored.isOn, "Consent must not survive the trip below the age gate")
     }
 
     // MARK: - Helpers
 
-    private func setBirthYear(_ app: XCUIApplication, to year: Int) {
-        app.buttons["settings.profile.birthYear"]
-            .requireExistence("the Born row")
-            .tap()
+    private func setBirthYear(to year: Int) {
+        tap(app.buttons["settings.profile.birthYear"], "the Born row")
 
         let field = app.textFields["profileEdit.birthYear.field"]
             .requireExistence("the birth year field")
@@ -106,7 +101,7 @@ final class AgeGatingUITests: AsteraUITestCase {
         }
         field.typeText(String(year))
 
-        app.buttons["profileEdit.save"].requireExistence("the Save button").tap()
+        tap(app.buttons["profileEdit.save"], "the Save button")
     }
 
     /// Every chip label reachable by scrolling the sheet to the bottom.
@@ -129,8 +124,8 @@ final class AgeGatingUITests: AsteraUITestCase {
 
     private func enable(_ app: XCUIApplication, _ identifier: String) {
         let toggle = app.switches[identifier].requireExistence("the \(identifier) toggle")
-        if toggle.value as? String != "1" { toggle.tap() }
-        XCTAssertEqual(toggle.value as? String, "1", "\(identifier) should be on")
+        if !toggle.isOn { flip(toggle, "the \(identifier) toggle") }
+        XCTAssertTrue(toggle.isOn, "\(identifier) should be on")
     }
 
     private func openLogSheetFromSettings(_ app: XCUIApplication) {

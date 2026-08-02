@@ -24,7 +24,7 @@ class CycleModeUITestCase: AsteraUITestCase {
 
         for mode in Self.modes {
             XCTContext.runActivity(named: "mode: \(mode.rawValue)") { _ in
-                let app = launchApp(mode: mode)
+                launchApp(mode: mode)
                 app.tabBars.buttons["Today"]
                     .requireExistence("the Today tab in \(mode.rawValue) mode")
 
@@ -49,7 +49,7 @@ class CycleModeUITestCase: AsteraUITestCase {
 
         for mode in Self.modes {
             XCTContext.runActivity(named: "mode: \(mode.rawValue), no cycles") { _ in
-                let app = launchApp(mode: mode, cycles: 0)
+                launchApp(mode: mode, cycles: 0)
                 app.tabBars.buttons["Today"]
                     .requireExistence("the Today tab in \(mode.rawValue) mode with no data")
                 XCTAssertEqual(

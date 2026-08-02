@@ -8,10 +8,8 @@ import XCTest
 final class AsteraPlusDisclosureUITests: AsteraUITestCase {
 
     private func openAsteraPlus() -> XCUIApplication {
-        let app = launchApp(tab: .settings)
-        app.buttons["settings.asteraPlus"]
-            .requireExistence("the Astera+ row in Settings")
-            .tap()
+        launchApp(tab: .settings)
+        tap(app.buttons["settings.asteraPlus"], "the Astera+ row in Settings")
         // The small print is the one block that renders regardless of whether StoreKit
         // products loaded, so it is the reliable "screen is up" signal.
         app.staticTexts["asteraPlus.smallPrint"].requireExistence("the Astera+ screen")
@@ -129,7 +127,7 @@ final class AsteraPlusDisclosureUITests: AsteraUITestCase {
         ] {
             let link = app.descendants(matching: .any)[identifier]
             link.requireExistence(what)
-            app.scrollViews.firstMatch.scrollTo(link)
+            scrollIntoView(link)
             XCTAssertTrue(link.isHittable, "\(what) exists but can't be tapped")
         }
     }
@@ -137,10 +135,7 @@ final class AsteraPlusDisclosureUITests: AsteraUITestCase {
     /// "Functional" is the word in the guideline, so this actually taps through to Safari.
     func testTermsLinkOpensInSafari() {
         let app = openAsteraPlus()
-        let link = app.descendants(matching: .any)["asteraPlus.termsLink"]
-        link.requireExistence("the Terms of Use link")
-        app.scrollViews.firstMatch.scrollTo(link)
-        link.tap()
+        tap(app.descendants(matching: .any)["asteraPlus.termsLink"], "the Terms of Use link")
 
         let safari = XCUIApplication(bundleIdentifier: "com.apple.mobilesafari")
         XCTAssertTrue(

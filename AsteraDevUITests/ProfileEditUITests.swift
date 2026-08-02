@@ -15,26 +15,26 @@ import XCTest
 /// subtitle does not break a test and nobody learns to avoid rewording.
 final class ProfileEditUITests: AsteraUITestCase {
 
-    // All three go through `tapReliably` on the base class rather than `.tap()`. The cycle mode
-    // picker is fourteen options deep inside a sheet, and on a short screen the later ones need
-    // real scrolling to reach. A tap that misses does not fail, it just does nothing, so the
-    // difference between these helpers and a bare tap is whether a failure is legible.
+    // All three go through `tap` on the base class rather than `XCUIElement.tap()`. The cycle
+    // mode picker is fourteen options deep inside a sheet, and on a short screen the later ones
+    // need real scrolling to reach. A tap that misses does not fail, it silently does nothing, so
+    // the difference between these helpers and a bare tap is whether a failure is legible.
 
-    private func openPicker(_ app: XCUIApplication, _ field: String) {
-        tapReliably(app.buttons["settings.profile.\(field)"], "the \(field) row in Settings", in: app)
+    private func openPicker(_ field: String) {
+        tap(app.buttons["settings.profile.\(field)"], "the \(field) row in Settings")
     }
 
-    private func choose(_ app: XCUIApplication, _ rawValue: String) {
-        tapReliably(app.buttons["choice.\(rawValue)"], "the \(rawValue) option", in: app)
+    private func choose(_ rawValue: String) {
+        tap(app.buttons["choice.\(rawValue)"], "the \(rawValue) option")
     }
 
-    private func save(_ app: XCUIApplication) {
-        tapReliably(app.buttons["profileEdit.save"], "the Save button", in: app)
+    private func save() {
+        tap(app.buttons["profileEdit.save"], "the Save button")
     }
 
     /// Reads the value shown on a Settings row. The row's label is "label, value", so the value is
     /// what comes after the label.
-    private func rowValue(_ app: XCUIApplication, _ field: String) -> String {
+    private func rowValue(_ field: String) -> String {
         app.buttons["settings.profile.\(field)"]
             .requireExistence("the \(field) row")
             .label
@@ -43,59 +43,59 @@ final class ProfileEditUITests: AsteraUITestCase {
     // MARK: - The round trip
 
     func testChangingCycleModeSticks() {
-        let app = launchApp(tab: .settings, mode: .regular)
+        launchApp(tab: .settings, mode: .regular)
 
         XCTAssertTrue(
-            rowValue(app, "cycleMode").localizedCaseInsensitiveContains("regular"),
-            "Expected the seeded mode first. Row said: \(rowValue(app, "cycleMode"))"
+            rowValue("cycleMode").localizedCaseInsensitiveContains("regular"),
+            "Expected the seeded mode first. Row said: \(rowValue("cycleMode"))"
         )
 
-        openPicker(app, "cycleMode")
-        choose(app, "perimenopause")
-        save(app)
+        openPicker("cycleMode")
+        choose("perimenopause")
+        save()
 
         XCTAssertTrue(
-            rowValue(app, "cycleMode").localizedCaseInsensitiveContains("perimenopause"),
-            "The mode did not save. Row said: \(rowValue(app, "cycleMode"))"
+            rowValue("cycleMode").localizedCaseInsensitiveContains("perimenopause"),
+            "The mode did not save. Row said: \(rowValue("cycleMode"))"
         )
     }
 
     func testChangingPronounsSticks() {
-        let app = launchApp(tab: .settings)
+        launchApp(tab: .settings)
 
-        openPicker(app, "pronouns")
-        choose(app, "heHim")
-        save(app)
+        openPicker("pronouns")
+        choose("heHim")
+        save()
 
         XCTAssertTrue(
-            rowValue(app, "pronouns").localizedCaseInsensitiveContains("he"),
-            "Pronouns did not save. Row said: \(rowValue(app, "pronouns"))"
+            rowValue("pronouns").localizedCaseInsensitiveContains("he"),
+            "Pronouns did not save. Row said: \(rowValue("pronouns"))"
         )
     }
 
     func testChangingTheGreetingSticks() {
-        let app = launchApp(tab: .settings)
+        launchApp(tab: .settings)
 
-        openPicker(app, "salutation")
-        choose(app, "person")
-        save(app)
+        openPicker("salutation")
+        choose("person")
+        save()
 
         XCTAssertTrue(
-            rowValue(app, "salutation").contains("Hey there."),
-            "The greeting did not save. Row said: \(rowValue(app, "salutation"))"
+            rowValue("salutation").contains("Hey there."),
+            "The greeting did not save. Row said: \(rowValue("salutation"))"
         )
     }
 
     func testChangingWhoYouTrackWithSticks() {
-        let app = launchApp(tab: .settings)
+        launchApp(tab: .settings)
 
-        openPicker(app, "relationship")
-        choose(app, "polyamorous")
-        save(app)
+        openPicker("relationship")
+        choose("polyamorous")
+        save()
 
         XCTAssertTrue(
-            rowValue(app, "relationship").localizedCaseInsensitiveContains("polyamorous"),
-            "The relationship structure did not save. Row said: \(rowValue(app, "relationship"))"
+            rowValue("relationship").localizedCaseInsensitiveContains("polyamorous"),
+            "The relationship structure did not save. Row said: \(rowValue("relationship"))"
         )
     }
 
@@ -104,14 +104,14 @@ final class ProfileEditUITests: AsteraUITestCase {
     /// Save and Cancel both close the sheet, so a Cancel that quietly saved would look identical
     /// from the Settings screen unless the value is checked.
     func testCancellingKeepsTheOldValue() {
-        let app = launchApp(tab: .settings, mode: .regular)
-        let before = rowValue(app, "cycleMode")
+        launchApp(tab: .settings, mode: .regular)
+        let before = rowValue("cycleMode")
 
-        openPicker(app, "cycleMode")
-        choose(app, "endometriosis")
-        tapReliably(app.buttons["profileEdit.cancel"], "the Cancel button", in: app)
+        openPicker("cycleMode")
+        choose("endometriosis")
+        tap(app.buttons["profileEdit.cancel"], "the Cancel button")
 
-        XCTAssertEqual(rowValue(app, "cycleMode"), before, "Cancel saved the change anyway")
+        XCTAssertEqual(rowValue("cycleMode"), before, "Cancel saved the change anyway")
     }
 
     // MARK: - The age gate reaches the picker
@@ -120,21 +120,21 @@ final class ProfileEditUITests: AsteraUITestCase {
     /// negative case alone would pass on a picker that showed nothing at all, so the same launch
     /// checks a neighbouring option is still there.
     func testUnderEighteensAreNotOfferedTryingToConceive() {
-        let app = launchApp(tab: .settings, birthYear: Age.underSexualThreshold)
+        launchApp(tab: .settings, birthYear: Age.underSexualThreshold)
 
-        openPicker(app, "cycleMode")
+        openPicker("cycleMode")
 
         app.buttons["choice.regular"].requireExistence("an ordinary option, so absence means something")
         app.buttons["choice.ttc"].requireAbsence("the trying-to-conceive option, for an under-18")
     }
 
     func testAdultsAreOfferedTryingToConceive() {
-        let app = launchApp(tab: .settings, birthYear: Age.adult)
+        launchApp(tab: .settings, birthYear: Age.adult)
 
-        openPicker(app, "cycleMode")
+        openPicker("cycleMode")
 
         let ttc = app.buttons["choice.ttc"].requireExistence("trying to conceive, for an adult")
-        bringFullyOnScreen(ttc, in: app)
+        scrollIntoView(ttc)
         XCTAssertTrue(ttc.isHittable, "An adult should be able to select it, not just see it")
     }
 }
