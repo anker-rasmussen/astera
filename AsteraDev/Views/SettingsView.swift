@@ -34,6 +34,10 @@ struct SettingsView: View {
     @State private var importPending = false
     @State private var importResult: HealthKitImportService.Result?
     @State private var importFailed = false
+    @State private var choosingCalendar = false
+    /// Held in state rather than read inline. Resolving it opens an `EKEventStore` and looks the
+    /// calendar up by identifier, which is not something to do on every body evaluation.
+    @State private var calendarDestinationName = CalendarSyncService.calendarTitle
 
     private var profile: UserProfile? { profiles.first }
     private var biometry: AppLockService.BiometryKind { AppLockService.availableBiometry }
@@ -90,6 +94,18 @@ struct SettingsView: View {
                 editableRow(label: "Born", value: profile.map { String($0.birthYear) } ?? "not set", field: .birthYear)
             }
         }
+        .sheet(isPresented: $choosingCalendar) {
+            CalendarDestinationPicker(
+                selected: CalendarSyncService.destinationIdentifier(),
+                onChoose: { identifier in
+                    choosingCalendar = false
+                    moveCalendarDestination(to: identifier)
+                },
+                onCancel: { choosingCalendar = false }
+            )
+            .ignoresSafeArea()
+        }
+        .task { calendarDestinationName = CalendarSyncService.destinationName() }
         .sheet(item: $editingField) { field in
             if let profile {
                 ProfileEditSheet(field: field, profile: profile, onDismiss: { editingField = nil })
@@ -397,7 +413,7 @@ struct SettingsView: View {
                         Text("Add your periods to a calendar")
                             .font(.asteraSerif(17, weight: .regular))
                             .foregroundStyle(AsteraColor.ink)
-                        Text("Astera makes one dedicated calendar, separate from your other ones, and adds your next predicted period to it. It updates whenever your pattern changes, and never touches anything else.")
+                        Text("Adds your next predicted period to a calendar. Astera makes its own by default, separate from your other ones. It updates whenever your pattern changes, and never touches anything else.")
                             .font(.asteraSerifItalic(14))
                             .foregroundStyle(AsteraColor.iron)
                             .lineSpacing(2)
@@ -407,6 +423,41 @@ struct SettingsView: View {
                 .tint(AsteraColor.accent)
                 .disabled(calendarPending)
                 .accessibilityIdentifier("settings.calendar.toggle")
+
+                // Hidden without full access rather than shown disabled. "Add Events Only" is a
+                // reasonable answer to the permission prompt, and it genuinely cannot list your
+                // calendars, so there is nothing to choose from and no wrong to put right.
+                if showInCalendar && CalendarSyncService.canChooseDestination {
+                    Hairline()
+                    Button {
+                        choosingCalendar = true
+                    } label: {
+                        HStack(alignment: .firstTextBaseline) {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("Write to")
+                                    .font(.asteraSerif(17, weight: .regular))
+                                    .foregroundStyle(AsteraColor.ink)
+                                Text("Its own calendar by default. Pick one of yours if you would rather it sat alongside everything else. Astera only ever touches the events it wrote.")
+                                    .font(.asteraSerifItalic(14))
+                                    .foregroundStyle(AsteraColor.iron)
+                                    .lineSpacing(2)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                            Spacer(minLength: AsteraSpacing.md)
+                            Text(calendarDestinationName)
+                                .font(.asteraSerif(17, weight: .regular))
+                                .foregroundStyle(AsteraColor.ink)
+                                .multilineTextAlignment(.trailing)
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 11, weight: .regular))
+                                .foregroundStyle(AsteraColor.iron.opacity(0.4))
+                        }
+                        .padding(.vertical, AsteraSpacing.sm)
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityIdentifier("settings.calendar.destination")
+                }
 
                 // Only offered once the calendar is on, because it is meaningless before that,
                 // and off by default. History in a calendar is a different disclosure from a
@@ -452,6 +503,25 @@ struct SettingsView: View {
                 syncCurrentPrediction()
             }
         )
+    }
+
+    /// Moves Astera's events to a different calendar, taking them out of the old one first.
+    ///
+    /// The name is re-read from the store afterwards rather than assumed, so a calendar that has
+    /// gone missing between the picker closing and the write shows the fallback it will actually
+    /// use instead of the one you tapped.
+    private func moveCalendarDestination(to identifier: String?) {
+        Task { @MainActor in
+            // Awaited, not fired alongside: the move clears the old calendar and repoints the
+            // destination, and a sync that overtook it would write the new events into the
+            // calendar we are trying to leave.
+            let name = await Task.detached {
+                try? CalendarSyncService.moveDestination(to: identifier)
+                return CalendarSyncService.destinationName()
+            }.value
+            calendarDestinationName = name
+            syncCurrentPrediction()
+        }
     }
 
     private var calendarBinding: Binding<Bool> {

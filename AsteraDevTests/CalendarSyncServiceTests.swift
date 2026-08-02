@@ -1,6 +1,7 @@
 import Foundation
 import Testing
 import SwiftData
+import EventKit
 @testable import Astera
 
 /// A calendar is the one place Astera's data leaves the app. It can sync to a work account, a
@@ -95,5 +96,50 @@ struct CalendarSyncScopeTests {
         defaults.removeObject(forKey: AppStorageKey.includePastPeriodsInCalendar.rawValue)
         #expect(defaults.object(forKey: AppStorageKey.includePastPeriodsInCalendar.rawValue) == nil,
                 "No stored value means the @AppStorage default of false applies")
+    }
+
+    // MARK: - What a sync is allowed to delete
+
+    /// The marker in each event's notes is the only thing separating a sync from the rest of your
+    /// calendar. While Astera owned its calendar outright, deleting everything in range was
+    /// merely crude. Now the destination can be a calendar you already use, and the same code
+    /// would take four years of real appointments with it.
+
+    @Test("Everything Astera writes carries the marker that lets it clean up later")
+    func everythingWrittenIsMarked() throws {
+        let context = try context()
+        try seedCycles(context)
+        let cycles = try context.fetch(FetchDescriptor<Cycle>())
+
+        let payload = CalendarSyncService.makePayload(
+            cycles: cycles,
+            prediction: prediction(),
+            includePastPeriods: true
+        )
+
+        let written = payload.pastPeriods + [payload.upcoming].compactMap { $0 }
+        #expect(written.count == 4, "Three logged cycles and a forecast, or this proves nothing")
+        for period in written {
+            #expect(
+                period.notes.contains(CalendarSyncService.asteraNoteMarker),
+                "An unmarked event is one Astera can never take back out again"
+            )
+        }
+    }
+
+    @Test("An event Astera did not write is never claimed as its own")
+    func foreignEventsAreLeftAlone() {
+        let store = EKEventStore()
+
+        let dentist = EKEvent(eventStore: store)
+        dentist.notes = "Dentist, second floor"
+        #expect(dentist.isWrittenByAstera == false, "A real appointment must survive a sync")
+
+        let bare = EKEvent(eventStore: store)
+        #expect(bare.isWrittenByAstera == false, "An event with no notes at all is not ours")
+
+        let ours = EKEvent(eventStore: store)
+        ours.notes = "\(CalendarSyncService.asteraNoteMarker)\n\nFrom Astera."
+        #expect(ours.isWrittenByAstera, "Otherwise Astera leaves its own events behind forever")
     }
 }

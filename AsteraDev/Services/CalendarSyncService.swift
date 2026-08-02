@@ -130,7 +130,7 @@ enum CalendarSyncService {
     /// Replaces any prior Astera-written events. This is the single source of truth from Astera into your calendar.
     static func sync(_ payload: SyncPayload) throws {
         let store = EKEventStore()
-        guard let calendar = try ensureCalendar(in: store) else {
+        guard let calendar = try resolveCalendar(in: store) else {
             throw CalendarSyncError.noWritableSource
         }
         try removeAsteraEvents(in: calendar, store: store)
@@ -175,19 +175,29 @@ enum CalendarSyncService {
     }
 
     /// Removes Astera events but leaves the calendar itself, so re-enabling sync is instant.
+    ///
+    /// Clears both possible homes, not just the current one. A destination that changed while
+    /// sync was off would otherwise leave events behind in the calendar nobody is looking at.
     static func clearEvents() throws {
         let store = EKEventStore()
-        guard let calendar = findCalendar(in: store) else { return }
-        try removeAsteraEvents(in: calendar, store: store)
+        for calendar in [chosenCalendar(in: store), findCalendar(in: store)].compactMap({ $0 }) {
+            try removeAsteraEvents(in: calendar, store: store)
+        }
     }
 
     // MARK: - Internals
 
+    /// Removes only the events Astera wrote, identified by the marker in their notes.
+    ///
+    /// The marker check is not defensive tidiness, it is the whole safety of this function. It
+    /// used to delete every event the predicate returned, which was survivable only while Astera
+    /// owned the calendar outright. The moment the destination can be a calendar you already use,
+    /// that same code deletes four years of your real appointments on the first sync.
     private static func removeAsteraEvents(in calendar: EKCalendar, store: EKEventStore) throws {
         let windowStart = Calendar.current.date(byAdding: .year, value: -2, to: Date()) ?? Date()
         let windowEnd = Calendar.current.date(byAdding: .year, value: 2, to: Date()) ?? Date()
         let predicate = store.predicateForEvents(withStart: windowStart, end: windowEnd, calendars: [calendar])
-        for event in store.events(matching: predicate) {
+        for event in store.events(matching: predicate) where event.isWrittenByAstera {
             try store.remove(event, span: .thisEvent, commit: false)
         }
         try store.commit()
@@ -195,6 +205,67 @@ enum CalendarSyncService {
 
     private static func findCalendar(in store: EKEventStore) -> EKCalendar? {
         store.calendars(for: .event).first { $0.title == calendarTitle && $0.allowsContentModifications }
+    }
+
+    // MARK: - Where the events go
+
+    /// The calendar Astera writes to: one you picked, or its own.
+    ///
+    /// Falls back rather than failing, because `calendarIdentifier` is not a durable handle. It
+    /// changes on a restore, on a reinstall, and when the account the calendar belonged to is
+    /// removed. A stale identifier means the calendar you chose is gone, and the useful answer to
+    /// that is Astera's own calendar rather than an error about a calendar you no longer have.
+    private static func resolveCalendar(in store: EKEventStore) throws -> EKCalendar? {
+        if let chosen = chosenCalendar(in: store) { return chosen }
+        return try ensureCalendar(in: store)
+    }
+
+    private static func chosenCalendar(in store: EKEventStore) -> EKCalendar? {
+        guard let identifier = destinationIdentifier(),
+              let calendar = store.calendar(withIdentifier: identifier),
+              calendar.allowsContentModifications
+        else { return nil }
+        return calendar
+    }
+
+    /// Nil when Astera should use its own calendar.
+    ///
+    /// Stored as a string because `@AppStorage` has no optional, so "no choice made" and "chose
+    /// Astera's own" are both the empty string on disk and both nil here. The `defaults`
+    /// parameter follows `AgeMode.reconcileAgeGatedSettings`, so a test can hand in a suite of
+    /// its own instead of writing to the real preferences.
+    static func destinationIdentifier(in defaults: UserDefaults = .standard) -> String? {
+        let stored = defaults.string(forKey: AppStorageKey.calendarDestination.rawValue)
+        return (stored?.isEmpty ?? true) ? nil : stored
+    }
+
+    static func setDestinationIdentifier(_ identifier: String?, in defaults: UserDefaults = .standard) {
+        defaults.set(identifier ?? "", forKey: AppStorageKey.calendarDestination.rawValue)
+    }
+
+    /// Choosing a destination needs to list your calendars, which write-only access cannot do.
+    /// iOS offers "Add Events Only" at the prompt, and taking it is a perfectly good answer, so
+    /// this is a real state rather than a corner case: those users keep the dedicated calendar.
+    static var canChooseDestination: Bool {
+        currentAuthorization == .granted
+    }
+
+    /// Points Astera at a different calendar, taking its events out of the old one on the way.
+    ///
+    /// Doing the removal first matters. Skip it and every calendar you ever chose keeps a stale
+    /// copy of your cycle, which is the opposite of what someone changing this setting wants.
+    static func moveDestination(to identifier: String?) throws {
+        if destinationIdentifier() != identifier {
+            try? clearEvents()
+        }
+        setDestinationIdentifier(identifier)
+    }
+
+    /// The name to show for the current destination.
+    static func destinationName() -> String {
+        guard canChooseDestination else { return calendarTitle }
+        let store = EKEventStore()
+        return chosenCalendar(in: store)?.title ?? calendarTitle
     }
 
     private static func ensureCalendar(in store: EKEventStore) throws -> EKCalendar? {
@@ -214,4 +285,12 @@ enum CalendarSyncService {
 
 enum CalendarSyncError: Error {
     case noWritableSource
+}
+
+extension EKEvent {
+    /// Whether Astera wrote this event, by the marker it puts in the notes of everything it
+    /// creates. The only thing standing between a sync and someone else's appointments.
+    var isWrittenByAstera: Bool {
+        notes?.contains(CalendarSyncService.asteraNoteMarker) == true
+    }
 }

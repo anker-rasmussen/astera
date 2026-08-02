@@ -145,6 +145,9 @@ enum AppStorageKey: String, CaseIterable {
     /// Whether the calendar gets your logged periods as well as the predicted one. Default false:
     /// a calendar can be shared, and history there says a great deal more than a forecast does.
     case includePastPeriodsInCalendar
+    /// Which calendar Astera writes to, as an `EKCalendar.calendarIdentifier`. Empty means the
+    /// dedicated "Astera" calendar, which is the default and the only option without full access.
+    case calendarDestination
     case syncToHealth
     case notifyPeriodInThreeDays
     case notifyPeriodToday
