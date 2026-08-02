@@ -308,22 +308,24 @@ enum PDFExportService {
 
     // MARK: - Formatting helpers
 
+    // `Date.FormatStyle` rather than a `DateFormatter` per call, which is what the rest of the
+    // app already uses. Two things came with the old version: a formatter allocated on every
+    // line of a document that draws one per flow day, and a hardcoded `d MMMM yyyy` that puts the
+    // day first whatever the reader's region says. A clinical printout is the last place to be
+    // opinionated about that, and the style honours the device's locale for free.
+
     private static func longDate(_ date: Date) -> String {
-        let f = DateFormatter()
-        f.dateFormat = "d MMMM yyyy"
-        return f.string(from: date)
+        date.formatted(.dateTime.day().month(.wide).year())
     }
 
     private static func shortDate(_ date: Date) -> String {
-        let f = DateFormatter()
-        f.dateFormat = "d MMM yyyy"
-        return f.string(from: date)
+        date.formatted(.dateTime.day().month(.abbreviated).year())
     }
 
+    /// The filename stamp, so this one stays `2026-08-02` everywhere rather than following the
+    /// locale: it sorts, and it is the same string on every device.
     private static func dateOnly(_ date: Date) -> String {
-        let f = DateFormatter()
-        f.dateFormat = "yyyy-MM-dd"
-        return f.string(from: date)
+        date.formatted(.iso8601.year().month().day().dateSeparator(.dash))
     }
 
     private static func severityWord(_ raw: Int) -> String {

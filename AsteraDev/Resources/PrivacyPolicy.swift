@@ -76,26 +76,14 @@ extension String {
     /// text already reads as the destination ("apple.com/legal/privacy"), so flattening loses
     /// nothing and keeps the in-app wording identical to the published page.
     func flatteningMarkdownLinks() -> String {
-        var result = ""
-        var rest = Substring(self)
-
-        while let openBracket = rest.firstIndex(of: "[") {
-            guard let closeBracket = rest[openBracket...].firstIndex(of: "]"),
-                  rest.index(after: closeBracket) < rest.endIndex,
-                  rest[rest.index(after: closeBracket)] == "(",
-                  let closeParen = rest[closeBracket...].firstIndex(of: ")")
-            else {
-                // Not a link: keep the bracket and carry on past it.
-                result += rest[..<rest.index(after: openBracket)]
-                rest = rest[rest.index(after: openBracket)...]
-                continue
-            }
-
-            result += rest[..<openBracket]
-            result += rest[rest.index(after: openBracket)..<closeBracket]
-            rest = rest[rest.index(after: closeParen)...]
-        }
-
-        return result + rest
+        // A regex literal, not a hand-walked index loop. The loop this replaced was twenty-odd
+        // lines of `index(after:)` arithmetic to say what the pattern says outright, and it had
+        // to special-case a bracket that turns out not to start a link. The pattern simply does
+        // not match those, so they survive untouched with no branch to get wrong.
+        //
+        // `AttributedString(markdown:)` would be the other obvious answer, and it is the wrong
+        // one here: it flattens the `#` and `##` prefixes too, and `PrivacyPolicyView` styles
+        // headings from exactly those.
+        replacing(/\[([^\]]*)\]\([^)]*\)/) { match in match.1 }
     }
 }
