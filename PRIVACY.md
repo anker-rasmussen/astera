@@ -2,7 +2,7 @@
 
 # Astera Privacy Policy
 
-_Version 1.1, May 2026._
+_Version 1.2, August 2026._
 
 This is the same text that ships inside the app and that is published at [anker-rasmussen.github.io/astera/privacy](https://anker-rasmussen.github.io/astera/privacy/). All three come from one source file, so they cannot disagree.
 
@@ -24,7 +24,11 @@ If you turn on the Apple Health toggle, Astera reads menstrual flow samples writ
 
 ### Calendar
 
-If you turn on the Calendar toggle, Astera writes predicted period dates to a dedicated "Astera" calendar that lives on your device. It never reads, touches, or modifies your other calendars.
+If you turn on the Calendar toggle, Astera writes your next predicted period into a calendar. By default it makes its own, called "Astera", and you can point it at one of your existing calendars instead. Your logged history is not written unless you separately ask for it.
+
+Where those events end up is iOS's business, not Astera's. If the calendar it uses is an iCloud calendar, which is the usual case, iOS syncs it to your other devices the same way it syncs every other calendar. If you choose a calendar belonging to a work or shared account, the events go wherever that account goes, and anyone that calendar is shared with can see them. This is the one part of Astera where your data leaves the phone, and it only happens because you asked for it. Turn the toggle off and Astera removes the events again.
+
+Astera only ever deletes the events it wrote itself. It never reads, changes, or removes anything else in your calendars.
 
 ### Notifications
 

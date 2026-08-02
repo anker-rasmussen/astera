@@ -107,5 +107,5 @@ Terms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/st
 ## Notes for next time
 
 - The two legal URLs live in `AsteraDev/Resources/AsteraLinks.swift` and in `appstore/listing.md`. Changing one without the other is the way this comes back.
-- The privacy policy exists in three places, all at **v1.1**: `PRIVACY.md`, `docs/privacy/index.html` (the live page), and `AsteraDev/Resources/PrivacyPolicy.swift` (what ships in the app). A reviewer can compare the in-app text against the linked URL, so they have to agree. If the text changes, bump the version in all three and confirm the live page has redeployed **before** recording anything.
+- The privacy policy exists in three places, all at **v1.2**: `PRIVACY.md`, `docs/privacy/index.html` (the live page), and `AsteraDev/Resources/PrivacyPolicy.swift` (what ships in the app). A reviewer can compare the in-app text against the linked URL, so they have to agree. If the text changes, bump the version in all three and confirm the live page has redeployed **before** recording anything.
 - CloudKit production schema deploy is still a pre-launch step. See `appstore/listing.md`.
