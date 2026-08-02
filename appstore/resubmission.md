@@ -48,7 +48,7 @@ For **each** of 000, 001, 002:
 
 - [ ] Localization filled in (display name and description)
 - [ ] Price set
-- [ ] **App Review screenshot uploaded.** This is the item the rejection names. Without it the product cannot reach Ready to Submit. Capture the Astera+ screen from the running app, or use `appstore/screenshots/`.
+- [ ] **App Review screenshot uploaded.** This is the item the rejection names. Without it the product cannot reach Ready to Submit. Upload `appstore/iap-review-screenshot.png` for all three; the field takes one image per product and the same one is correct for each.
 - [ ] Review notes pasted
 - [ ] Status shows **Ready to Submit**
 
@@ -85,7 +85,11 @@ Apple asks for a recording that confirms the disclosures. One continuous take, n
 
 ### 6. Reply to App Review
 
-Attach the recording and reply in the Resolution Center. Draft:
+Attach the recording and reply in the Resolution Center.
+
+`appstore/iap-small-print.png` can go alongside it as a still: it holds the whole renewal paragraph and both legal links in one frame, which the recording only shows in passing. It is a simulator capture and does not replace the recording, which has to come off a real device running this build.
+
+Draft:
 
 ```
 Thank you for the review.

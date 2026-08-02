@@ -40,7 +40,7 @@ Both monthly and yearly products live inside this group. Users moving between th
 | **Description** _(45 char min, 4000 max)_ | `Monthly support for Astera. Cancel any time from your App Store subscriptions. Includes themes, widgets, detailed cycle insights, custom symptoms and flow types, and the Apple Watch app as it ships.` |
 
 **Review Information**
-- **Screenshot**: Use `appstore/screenshots/06-log-sheet.png` or capture the Astera+ tab from inside the app.
+- **Screenshot**: `appstore/iap-review-screenshot.png`. It shows the Astera+ screen with all three tiers, their prices and their renewal terms, which is what the reviewer is checking. Do not use a shot of the log sheet: it does not show the purchase.
 - **Review Notes**:
 ```
 Astera+ is an optional support tier. The free version of Astera includes all core tracking functionality. This subscription unlocks cosmetic and convenience features (themes, widgets, insights, custom symptoms, Apple Watch). Users access this via Settings → Astera+. It is never gated behind a paywall on core flows.
