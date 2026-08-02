@@ -91,15 +91,12 @@ final class AgeGatingUITests: AsteraUITestCase {
     private func setBirthYear(to year: Int) {
         tap(app.buttons["settings.profile.birthYear"], "the Born row")
 
-        let field = app.textFields["profileEdit.birthYear.field"]
-            .requireExistence("the birth year field")
-        field.tap()
-        // Select-all then retype: the field is pre-filled with the current year.
-        field.press(forDuration: 1.2)
-        if app.menuItems["Select All"].waitForExistence(timeout: 2) {
-            app.menuItems["Select All"].tap()
-        }
-        field.typeText(String(year))
+        // `adjust(toPickerWheelValue:)` is the whole interaction now. The field this replaced
+        // needed a long press, a Select All from the edit menu and a retype, because typing into
+        // a pre-filled field appends rather than replaces.
+        app.pickerWheels.firstMatch
+            .requireExistence("the birth year wheel")
+            .adjust(toPickerWheelValue: String(year))
 
         tap(app.buttons["profileEdit.save"], "the Save button")
     }

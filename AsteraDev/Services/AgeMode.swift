@@ -11,6 +11,27 @@ enum AgeMode {
     /// fertility content but younger than 18.
     static let sexualContentThreshold = 16
 
+    /// Nobody alive was born before this many years ago, and nobody at all was born after this
+    /// year. Deliberately generous at the old end: the point is to exclude nonsense, not to
+    /// judge, and the cost of a range that is a decade too kind is nothing.
+    static let maxPlausibleAge = 120
+
+    /// The years a birth year is allowed to be.
+    ///
+    /// The pickers are built from this range, which is the reason it exists. An input that cannot
+    /// express an invalid year needs no validation, no error copy and no rejected save. Before
+    /// this, both birth year fields took any four digits: `3000` saved happily and then read as
+    /// an age of minus a thousand, which every age gate treats as a small child.
+    static var validBirthYears: ClosedRange<Int> {
+        let thisYear = Calendar.current.component(.year, from: Date())
+        return (thisYear - maxPlausibleAge)...thisYear
+    }
+
+    /// Pulls a year into range, for values that predate the pickers or arrive from an import.
+    static func clampBirthYear(_ year: Int) -> Int {
+        min(max(year, validBirthYears.lowerBound), validBirthYears.upperBound)
+    }
+
     static func age(forBirthYear year: Int, on date: Date = Date()) -> Int {
         Calendar.current.component(.year, from: date) - year
     }

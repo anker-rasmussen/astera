@@ -330,67 +330,35 @@ struct BirthYearEditView: View {
     let onDismiss: () -> Void
     @Environment(\.modelContext) private var modelContext
 
-    @State private var text: String
-    @FocusState private var focused: Bool
+    @State private var year: Int
 
     init(profile: UserProfile, onDismiss: @escaping () -> Void) {
         self.profile = profile
         self.onDismiss = onDismiss
-        _text = State(initialValue: String(profile.birthYear))
-    }
-
-    private var typedYear: Int? {
-        Int(text.trimmingCharacters(in: .whitespaces))
+        // Clamped on the way in as well as on the way out: a profile stored before the picker
+        // existed can hold a year the picker has no row for, and an unmatched selection shows
+        // the wheel parked on something the profile does not say.
+        _year = State(initialValue: AgeMode.clampBirthYear(profile.birthYear))
     }
 
     var body: some View {
         EditScaffold(
             title: "Birth year",
             subtitle: "Helps tailor things like teen-mode and perimenopause framing. We never share this.",
-            canSave: typedYear != nil,
+            // Always saveable. The picker cannot hold a year that is not a year, so there is no
+            // longer a state where Save has to be refused.
+            canSave: true,
             onCancel: onDismiss,
             onSave: save
         ) {
             VStack(alignment: .leading, spacing: AsteraSpacing.md) {
-                HStack(alignment: .firstTextBaseline, spacing: AsteraSpacing.sm) {
-                    TextField("\(profile.birthYear)", text: $text)
-                        .accessibilityIdentifier("profileEdit.birthYear.field")
-                        .keyboardType(.numberPad)
-                        .focused($focused)
-                        .font(.asteraNumeric(48, weight: .medium))
-                        .foregroundStyle(AsteraColor.ink)
-                        .tint(AsteraColor.accent)
-                        .frame(maxWidth: 160, alignment: .leading)
-                        .onChange(of: text) { _, newValue in
-                            let digits = newValue.filter(\.isNumber).prefix(4)
-                            if digits != Substring(newValue) {
-                                text = String(digits)
-                            }
-                        }
-                        .toolbar {
-                            ToolbarItemGroup(placement: .keyboard) {
-                                Spacer()
-                                Button("Done") { focused = false }
-                                    .font(.asteraSerif(15, weight: .medium))
-                                    .foregroundStyle(AsteraColor.accent)
-                            }
-                        }
-                    if let year = typedYear {
-                        let age = Calendar.current.component(.year, from: Date()) - year
-                        Text("(\(age))")
-                            .font(.asteraSerifItalic(18))
-                            .foregroundStyle(AsteraColor.iron)
-                    }
-                    Spacer()
-                }
-                .onAppear { focused = true }
+                BirthYearField(year: $year)
                 Hairline()
             }
         }
     }
 
     private func save() {
-        guard let year = typedYear else { return }
         profile.birthYear = year
         profile.modifiedAt = Date()
         try? modelContext.save()

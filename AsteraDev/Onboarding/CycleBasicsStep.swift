@@ -6,10 +6,7 @@ struct CycleBasicsStep: View {
     let onSkip: () -> Void
     let onContinue: () -> Void
 
-    @State private var birthYearText: String = ""
-    @FocusState private var birthYearFocused: Bool
 
-    private var currentYear: Int { Calendar.current.component(.year, from: Date()) }
 
     var body: some View {
         OnboardingScaffold(
@@ -135,63 +132,15 @@ struct CycleBasicsStep: View {
     private var birthYearSection: some View {
         VStack(alignment: .leading, spacing: AsteraSpacing.sm) {
             CapsLabel(text: "Birth year")
-            HStack(alignment: .firstTextBaseline, spacing: AsteraSpacing.sm) {
-                TextField("\(draft.birthYear)", text: $birthYearText)
-                    .keyboardType(.numberPad)
-                    .textContentType(.none)
-                    .focused($birthYearFocused)
-                    .font(.asteraNumeric(40, weight: .medium))
-                    .foregroundStyle(AsteraColor.ink)
-                    .tint(AsteraColor.accent)
-                    .frame(maxWidth: 140, alignment: .leading)
-                    .onAppear {
-                        if birthYearText.isEmpty {
-                            birthYearText = String(draft.birthYear)
-                        }
-                    }
-                    .onChange(of: birthYearText) { _, newValue in
-                        let digits = newValue.filter(\.isNumber).prefix(4)
-                        if digits != Substring(newValue) {
-                            birthYearText = String(digits)
-                        }
-                        if let year = Int(digits) {
-                            draft.birthYear = year
-                        }
-                    }
-                    .toolbar {
-                        ToolbarItemGroup(placement: .keyboard) {
-                            Spacer()
-                            Button("Done") { birthYearFocused = false }
-                                .font(.asteraSerif(15, weight: .medium))
-                                .foregroundStyle(AsteraColor.accent)
-                        }
-                    }
-                if let year = typedYear {
-                    Text("(\(currentYear - year))")
-                        .font(.asteraSerifItalic(15))
-                        .foregroundStyle(AsteraColor.iron)
-                }
-                Spacer()
-            }
+
+            BirthYearField(year: $draft.birthYear)
 
             Text("This helps us frame things appropriately. Younger users see teen-mode framing, perimenopause-aged users see perimenopause language. It stays on this phone.")
                 .font(.asteraSerifItalic(13))
                 .foregroundStyle(AsteraColor.iron)
                 .fixedSize(horizontal: false, vertical: true)
-
-            if let year = typedYear, let gate = AgeMode.gentleGateMessage(birthYear: year) {
-                Text(gate)
-                    .font(.asteraSerifItalic(13))
-                    .foregroundStyle(AsteraColor.accent)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .padding(.top, AsteraSpacing.xs)
-            }
         }
         .padding(.vertical, AsteraSpacing.lg)
-    }
-
-    private var typedYear: Int? {
-        Int(birthYearText.trimmingCharacters(in: .whitespaces))
     }
 
     private func circularStep(systemName: String, action: @escaping () -> Void) -> some View {
