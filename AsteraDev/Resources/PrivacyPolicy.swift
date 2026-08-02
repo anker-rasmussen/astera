@@ -24,9 +24,16 @@ enum PrivacyPolicy {
         /// If the resource is ever missing, show a short pointer to the live policy rather than
         /// placeholder prose. `PrivacyPolicyTests` asserts the real document loads, so this is a
         /// belt-and-braces path rather than an expected one.
+        ///
+        /// It states no version on purpose. It used to carry a real-looking one, which went stale
+        /// the moment the policy was bumped and would have had the app claim a version the live
+        /// page had moved past. That is the exact drift this file exists to prevent, and a
+        /// reviewer comparing the screen against the URL is who would find it. "unknown" is also
+        /// what lets the tests tell a parsed document apart from this one.
+        static let unknownVersion = "unknown"
         static let fallback = Document(
-            version: "1.1",
-            updated: "May 2026",
+            version: unknownVersion,
+            updated: unknownVersion,
             body: """
             # Astera collects nothing.
 

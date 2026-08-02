@@ -16,10 +16,19 @@ struct PrivacyPolicyTests {
         #expect(PrivacyPolicy.body.count > 3000)
     }
 
-    @Test("Version and date come from the source frontmatter")
+    /// Asserts the shape, not the number. Pinning the literal made this file a second home for
+    /// the version, so every policy bump broke a test that had learned nothing, and worse, it
+    /// could not tell a parsed document from the fallback: both read "1.1". The frontmatter is
+    /// the single source of truth, and `build_privacy.py --check` is what proves the three
+    /// artifacts agree on it.
+    @Test("Version and date come from the source frontmatter, not the fallback")
     func metadataIsParsed() {
-        #expect(PrivacyPolicy.version == "1.1")
-        #expect(PrivacyPolicy.lastUpdated == "May 2026")
+        #expect(PrivacyPolicy.version != PrivacyPolicy.Document.unknownVersion)
+        #expect(PrivacyPolicy.lastUpdated != PrivacyPolicy.Document.unknownVersion)
+        #expect(PrivacyPolicy.version.wholeMatch(of: /\d+\.\d+/) != nil,
+                "A version that is not major.minor means the frontmatter parse drifted")
+        #expect(PrivacyPolicy.lastUpdated.contains(/\d{4}/),
+                "The updated line should carry a year")
     }
 
     @Test("Headings keep their Markdown markers so the view need not guess")
