@@ -1,6 +1,31 @@
-# Resubmission after the v1.0 rejection
+# Resubmission after the v1.0 rejections
 
-Two rejections came back together. They resolve through **different mechanisms**, and the order below matters because the screen recording has to show the new build.
+## Round three, 4 August 2026 (submission 02b4a40e, build 1.0 (31), reviewed on iPad Air 11-inch M3)
+
+**3.1.2(c) was not raised again.** The subscription disclosures are accepted. Do not undo that work.
+
+| Guideline | What Apple wants | Resolves via |
+|---|---|---|
+| 5.1.1(iv) Privacy | The button before the HealthKit prompt must not name the permission | **Code, done.** The Settings import button now reads "Continue" |
+| 2.1(b) Performance | The three Astera+ IAPs submitted for review | **App Store Connect only.** Nothing in the repo can fix this |
+
+### 2.1(b) came back unchanged, which narrows the cause
+
+This is the second time. The disclosure work went in and was accepted, so the app itself is not the problem: the products were not part of the submission. Apple's wording is that the app "includes references to plus but the associated In-App Purchase products have not been submitted for review".
+
+A product sitting at Ready to Submit is **not** submitted. It has to be attached to the version, which is step 2 below and is a separate action on a separate page. If that step was done and this still came back, the likely cause is that one of the three lacked its App Review screenshot and so never reached Ready to Submit, leaving it silently unselectable.
+
+Before uploading again, take a screenshot of the version page showing all three products selected. It is the only evidence that this step actually happened.
+
+### The build number does not match the repo
+
+Apple reviewed **build 31**. `AsteraDev/Info.plist` held **2** at the time, so the archive that shipped did not take its build number from this file. Whatever sets it (Xcode's automatic versioning, or a manual edit before archiving) is the real source of truth, and the repo has been recording a number nobody uses.
+
+`CFBundleVersion` is now **32**, which is the next legal value after 31. If the archive process overrides it anyway, that is fine, but the number that goes up must be greater than 31 or App Store Connect will refuse the upload.
+
+---
+
+## Round two (resolved, kept for the record)
 
 | Guideline | What Apple wants | Resolves via |
 |---|---|---|
@@ -67,7 +92,7 @@ Products can sit at Ready to Submit indefinitely without being part of the submi
 
 ### 4. Build and upload
 
-- [x] `CFBundleVersion` in `AsteraDev/Info.plist` is now `2`. `CFBundleShortVersionString` stays `1.0`. Bump it again for every further upload, even a rejected one: App Store Connect refuses a build number it has already seen.
+- [x] `CFBundleVersion` in `AsteraDev/Info.plist` is now `32`, the next value after the reviewed build 31. `CFBundleShortVersionString` stays `1.0`. Bump it again for every further upload, even a rejected one: App Store Connect refuses a build number it has already seen. Confirm the number in the uploaded build matches, because the last one did not.
 - [ ] Archive and upload, attach the build to the version
 
 ### 5. Record the screen recording

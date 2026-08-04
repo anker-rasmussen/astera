@@ -232,9 +232,16 @@ struct SettingsView: View {
                         .lineSpacing(2)
                         .fixedSize(horizontal: false, vertical: true)
 
+                    // "Continue", not "Import from Apple Health". App Review rejected the
+                    // latter under 5.1.1(iv) on 4 August 2026: explanatory copy followed by a
+                    // button naming the permission reads as steering the user toward granting
+                    // it, and the guideline wants the button neutral so the system prompt is
+                    // where the actual decision gets made. Apple named "Continue" and "Next" as
+                    // acceptable, so this uses their word rather than a synonym of our own.
+                    // The paragraph above is allowed and is the right place to explain why.
                     Button(action: runImport) {
                         HStack {
-                            Text(importPending ? "Looking…" : "Import from Apple Health")
+                            Text(importPending ? "Looking…" : "Continue")
                                 .font(.asteraSerif(17, weight: .medium))
                             Spacer()
                             if !importPending {
